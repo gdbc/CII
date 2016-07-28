@@ -7,7 +7,7 @@
 
 
 ## Intro
-This is a poor man's guide to Automated Continuous Infrastructure Integration or CII on RPM based Linux distributions that use Puppet and GIT. 
+This is a poor man's guide to building an Automated Continuous Infrastructure Integration or CII on RPM based Linux distributions that use Puppet and GIT. 
 
 Use this guide if you want to sync and test newly synced packages in an environment automatically, as well as test new or edited puppet code and post install TAP compliant scripts to test, verify and graph build environment integrity after packages have been installed and puppet has been run.
 
@@ -26,3 +26,8 @@ These three points:
 This enables infrastructure teams to release patches and configuration and automatically test the results of those changes and those patches and configuration will work in the target environments, be it DEV, UAT or PRD, reducing or negating manual effort to achieve and document the same results.
 
 Even if you have a staggered release cycle, it still pays to use CII to do the work up until you release.
+
+## Environment Configuration
+We’re going to work with 3 environments 7_dev, 7_uat and 7_prd. These three environments coincide with Pulp repo groups with the same name, Foreman Puppet environments with the same name, similarly named Foreman Host Groups(eg: hg-7_dev...) and Foreman Operating Systems (cent-7_dev...). The OS used is CentOS 7, though any RPM based distro should work.
+
+Follow this guide to the end and a much clearer picture of what we’re doing will be revealed.
