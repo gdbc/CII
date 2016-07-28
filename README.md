@@ -116,3 +116,22 @@ Installing the Pulp server is out of scope as there's sufficient documentation o
 * Pulp environment diff check: pulp-env-diff-check.py
 
 <b><u>To Do:</u></b> 
+
+* Configure mount point /var/lib/pulp and /var/lib/mongodb
+* Edit the server entry in create-cii-server-repos.sh and run it to setup the yum repos we will use as our upstream source.
+* Change REPO_SERVER and MASTER_GROUP_ID in create-sync-master-repos.sh and execute. This will create the master pulp repo group and repos that syncs directly from the repo server. This repo will be used to determine diffs against the eng environment, then eng against dev and so on to determine a difference and kickoff a jenkins jobs.
+* Change USER/PASS SERVER_URL in clone-create-repo-group.sh and create your other environments.
+  * Syntax: ./clone-create-repo-group.sh SRC_GRP DST_GRP FEED_GRP
+  … where FEED_GRP is the repo group you’ll be syncing from ie: dev -> uat -> prd eg:
+   ```
+   ./clone-create-repo-group.sh 7_master 7_dev 7_master
+   ./clone-create-repo-group.sh 7_dev 7_uat 7_dev
+   ./clone-create-repo-group.sh 7_uat 7_prd 7_uat
+   ```
+* Change SERVER, DST_ENV and USER/PASS in sync-master-repo-group.py and copy it to /etc/cron.daily
+* Create three or however many copies of pulp-env-diff-check.py, one for each repo group or environment, this involves changing SERVER, SRC_ENV, DST_ENV and the JENKINS_SERVER_URI. This script compares a repository group against one that it syncs from(source). This enables us to determine if new packages are found upstream and if there are, a jenkins job is triggered to test these new packages. 
+  * Example: For the DEV environment, SRC_ENV would be “7_master” and DST_ENV would be “7_dev”. What this means is a diff between the “7_master” and “7_dev” repo group is run periodically and if a diff exists (more packages in the 7_master repo), a jenkins job will be started.
+  * Put these script in cron.daily or whatever suites or in line with business requirements.
+ 
+<b><u>NB:</u></b> Many of the scripts following rely on the environment matching this MASTER_GROUP_ID in particular the pulp repo names: puppetlabs-deps-7_master. They end in 7_master, split on an “-” which demarcates the environment. We’re going to use this elsewhere in Jenkins and Foreman.
+
