@@ -279,7 +279,8 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
      * Root password: <enter password>
      * Submit
 * Clone this environment to create the remaining environments if required...
-   * <b<<u>NB:</u></b> When creating new environments you must create the puppet directory structure first before running the script eg: if you want a “tst” environment, on the foreman server run:
+   * <b>NB:</b> When creating new environments you must create the puppet directory structure first before running the script eg: if you want a “tst” environment, on the foreman server run:
      * `mkdir -p /etc/puppet/environments/7_tst/{modules, manifests}`
 * For the purposes of this how to we’re creating a “dev”, “uat” and “prd” environment, so lets create the two extra environments.
    * `mkdir -p /etc/puppet/environments/{7_uat,7_prd}/{modules,manifests}`
+* <b>NB:</b> You should go back and use clone-create-repo-group.sh to create the Pulp repo group if the environment is newer than the ones created. See Pulp Server section. <- this should be done first
