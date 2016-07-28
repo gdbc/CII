@@ -191,7 +191,9 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
    * ""ks-7"" FILE
     * Note this a custom kickstart for descriptive purposes. You will probably need to configure your own.
     * CII Repos are kept out of my Puppet code so it doesn’t contaminate the CII project runs.
-Type: Provision
+    * Type: Provision
+* Add the 7_dev repositories:
+   * Hosts -> Installation Media -> New medium
 
 
 
