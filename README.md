@@ -7,6 +7,7 @@
 
 
 ## Intro
+========
 This is a poor man's guide to building an Automated Continuous Infrastructure Integration or CII on RPM based Linux distributions that use Puppet and GIT. 
 
 Use this guide if you want to sync and test newly synced packages in an environment automatically, as well as test new or edited puppet code and post install TAP compliant scripts to test, verify and graph build environment integrity after packages have been installed and puppet has been run.
@@ -28,18 +29,21 @@ This enables infrastructure teams to release patches and configuration and autom
 Even if you have a staggered release cycle, it still pays to use CII to do the work up until you release.
 
 ## Environment Configuration
+============================
 We’re going to work with 3 environments 7_dev, 7_uat and 7_prd. These three environments coincide with Pulp repo groups with the same name, Foreman Puppet environments with the same name, similarly named Foreman Host Groups(hg-7_dev...) and Foreman Operating Systems (cent-7_dev...). The OS used in this guide is CentOS 7, though any RPM based distro should work.
 
 Follow this guide to the end and a much clearer picture of what we’re doing will be revealed.
 
 ## System Requirements
-
+======================
 * 1 x Libvirtd host
 * 1 x Foreman server KVM VM
 * 1 x YUM repo server KVM VM
 * 1 x Pulp server KVM VM
 * 1 x Jenkins server KVM VM
 
-<b>Note:</b> All systems used here are on a libvirtd host, upon which they are guests. This libvirtd servers’ name is core.ci.com and will be used as a compute resource provider.
+<b>Note:</b> All systems used here are on a libvirtd host, upon which they are guests. This libvirtd servers name is core.ci.com and will be used as a compute resource provider.
 
-I’ve added each server to the hosts file as well as the libvirtd as some systems will need to connect to this host to orchestrate VM’s.
+## Libvirt Host
+===============
+This server hosts the CII systems and needs to be enabled for  Foreman to  access and rebuild VM’s.
