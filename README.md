@@ -165,7 +165,7 @@ foreman-installer  --enable-foreman-proxy --foreman-proxy-dns=true --enable-fore
   * Infrastructure -> Compute Resources -> New Compute Resource
   * Name: “libvirtd” Provider: “Libvirtd” URL: qemu+tcp://<libvirtd hostname>:16509/system (check which ip the port 16509 is running on on the libvirtd host)
    * Create and cp your root public ssh key to the libvirtd server from ci-foreman for the root user
-   * Test Connection and close
+   * "Test Connection" and close
     * If the connection fails you may have to add some iptables rules etc
 
 
