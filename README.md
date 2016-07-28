@@ -109,11 +109,13 @@ Installing the Pulp server is out of scope as there's sufficient documentation o
 * Memory: 8GB
 
 <b><u>Scripts:</u></b>
-* Install Pulp Server: install-pulp.sh
 * Configure yum repos: create-cii-server-repos.sh
+* Install Pulp Server: install-pulp.sh
 * Create, sync master repo: create-sync-master-repos.sh
 * Sync master repo group: sync-master-repo-group.py
 * Pulp environment diff check: pulp-env-diff-check.py
+
+<b><u>Note:</u></b> The create-cii-server-repos.sh should be run to setup each server to point to the yum repo server repositories to get their requisite packages.
 
 <b><u>To Do:</u></b> 
 
@@ -306,3 +308,29 @@ Hosts need to be powered off for Jenkins to determine them as being available.
    * Operating Systems -> Provisioning Templates -> Resolve
    * Submit
    * The rest should be filled in automatically, you may need to insert a temporarily static ip when you select “submit”. 
+
+======
+##Jenkins Server
+
+The Jenkins server is the orchestrator of all of our jobs and the backbone to the CII engine. It listens for the Pulp cron jobs and git hooks to execute the jobs you are going to setup below which includes using foreman to rebuild a system and then run a set of configured post build jobs ie: Puppet, Pulp repository syncs and BAT tests and collates and graphs the results.
+
+<b><u>SPECS:</u></b>
+* Name: cii-jenkins.ci.com
+* Storage: N/A
+* Memory: 4GB
+
+<u><b>Scripts:</u></b>
+* Configure yum repos: create-cii-server-repos.sh
+* User pass library: userpass.py
+* Jenkins Configs: ci-run-config.xml, post_ci_promotion_config.xml
+* GIT post-receive hook: post-receive
+
+<b><u>To Do:</u></b> 
+* Install Jenkins and support packages
+* ```
+yum install java jenkins python-requests python-paramiko git -y
+systemctl enable jenkins
+systemctl start jenkins
+```
+You may need to edit /etc/sysconfig/jenkins and set the following if you dont see java running on port 8080:
+`JENKINS_AJP_PORT="-1"`
