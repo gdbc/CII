@@ -344,5 +344,12 @@ You may need to edit /etc/sysconfig/jenkins and set the following if you dont se
   * Parameterized Trigger Plugin
   * Build Authorization Token Root Plugin
   * Workspace Cleanup Plugin
+* Enable security to run jobs via script remotely
+  * Jenkins -> Manage Jenkins -> Configure Global Security 
+  * Select Enable Security
+  * Select Delegate to servlet container
+  * Disable “Prevent Cross Site Request Forgery exploits”
+  * Select “Apply” then “Save”
+  * I’ve had to, for some reason edit /var/lib/jenkins/config.xml and set useSecurity to false, restart jenkins and perform this `"Enable Security"` section again.
 
 
