@@ -298,3 +298,11 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
 * Build some test hosts bound to each host group so jenkins can find available hosts to use to reinstall and run the CII jobs on, this will also test that your host provisioning works. 
 Hosts need to be powered off for Jenkins to determine them as being available. 
 * Make sure you can resolve or get to these hosts from the foreman, jenkins and core servers.
+* To build a host:
+   * HOSTS -> New Host
+   * Name: test
+   * Host Group: hg-7_dev
+   * Deploy on: libvirtd
+   * Operating Systems -> Provisioning Templates -> Resolve
+   * Submit
+   * The rest should be filled in automatically, you may need to insert a temporarily static ip when you select “submit”. 
