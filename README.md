@@ -37,9 +37,9 @@ Follow this guide to the end and a much clearer picture of what we’re doing wi
 ## System Requirements
 
 * 1 x Libvirtd host
-* 1 x Foreman server KVM VM
 * 1 x Yum repo server KVM VM
 * 1 x Pulp server KVM VM
+* 1 x Foreman server KVM VM
 * 1 x Jenkins server KVM VM
 
 **Note:** All systems used here are on a libvirtd host, upon which they are guests. This libvirtd servers name is core.ci.com and will be used as a compute resource provider.
