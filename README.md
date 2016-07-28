@@ -194,7 +194,8 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
     * Type: Provision
 * Add the 7_dev repositories:
    * Hosts -> Installation Media -> New medium
-|Name	                      |Path	                                                           | OS Family |    
+
+| Name                      |Path	                                                           | OS Family |    
 | ------------------------- | -------------------------------------------------------------- | --------- |
 | base-7_dev	               | (http://cii-pulp.ci.com/pulp/repos/base-7_dev/) 	              | Red Hat   |
 | epel-7_dev	               | (http://cii-pulp.ci.com/pulp/repos/epel-7_dev/)	               | Red Hat   |
