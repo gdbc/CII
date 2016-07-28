@@ -151,8 +151,8 @@ What we’re doing here is setting up the first environment(7_dev) and from ther
 
 <b><u>Scripts:</u></b>
 * Configure yum repos: [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh)
-* Kickstart-template: ks-7
-* Clone Env: clone-os-hg.py
+* Kickstart-template: [ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7)
+* Clone Env: [clone-os-hg.py](https://github.com/gdbc/CII/blob/master/cii/foreman/clone-os-hg.py)
 
 
 <b><u>To Do:</u></b>
@@ -161,7 +161,7 @@ What we’re doing here is setting up the first environment(7_dev) and from ther
 * Install Foreman:
 ```
 yum install foreman-installer git python-requests -y 
-foreman-installer  --enable-foreman-proxy --foreman-proxy-dns=true --enable-foreman-compute-libvirt --foreman-configure-epel-repo false --foreman-configure-scl-repo false (epel and scl are disabled here as they sync’d and added via [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh))
+foreman-installer  --enable-foreman-proxy --foreman-proxy-dns=true --enable-foreman-compute-libvirt --foreman-configure-epel-repo false --foreman-configure-scl-repo false (epel and scl are disabled here as they sync’d and added via create-cii-server-repos.sh)
 ```
 * Lets setup foreman, connect to foreman url as stated in output of install command, change the admin password to “admin”(if changed to something else be sure to change it in scripts used above) and lets get to work.
   * Infrastructure -> Compute Resources -> New Compute Resource
@@ -169,7 +169,7 @@ foreman-installer  --enable-foreman-proxy --foreman-proxy-dns=true --enable-fore
    * Create and cp your root public ssh key to the libvirtd server from ci-foreman for the root user
    * "Test Connection" and close
     * If the connection fails you may have to add some iptables rules etc
-* Next, setup the first environment, “7_dev”, after that we’ll clone it to uat and prd with clone-os-hg.py that will fill in the blanks in templates etc.
+* Next, setup the first environment, “7_dev”, after that we’ll clone it to uat and prd with [clone-os-hg.py](https://github.com/gdbc/CII/blob/master/cii/foreman/clone-os-hg.py) that will fill in the blanks in templates etc.
   * First scp your puppet modules and environments over to the Foreman server, make the path: /etc/puppet/environments/7_dev, verify ownership is puppet.root
    * NB: You will need to add your modules to /etc/puppet/modules to facilitate importing into respective environments
    ``` 
@@ -190,7 +190,7 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
    foreman-server:<foreman server>
 * Add the kickstart template
    * Hosts -> Provisioning Templates -> New Template -> Name: ks-7
-   * ""ks-7"" FILE
+   * Add [ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7) FILE
     * Note this a custom kickstart for descriptive purposes. You will probably need to configure your own.
     * CII Repos are kept out of my Puppet code so it doesn’t contaminate the CII project runs.
     * Type: Provision
@@ -212,7 +212,7 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
 | centos-sclo-rh-7_dev      | `http://cii-pulp.ci.com/pulp/repos/centos-sclo-rh-7_dev/`       | Red Hat   |
 | centos-sclo-sclo-7_dev    | `http://cii-pulp.ci.com/pulp/repos/centos-sclo-sclo-7_dev/`     | Red Hat   |
 
-* Add the required repositories(if necessary) to the ks-7 kickstart profile to use to install from(see current kickstart as a guide)
+* Add the required repositories(if necessary) to the [ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7) kickstart profile to use to install from(see current kickstart as a guide)
 ```
 # Add Repos
 repo --name=base             --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/base-<%=@host.environment %> --install 
@@ -286,7 +286,7 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
 * For the purposes of this how to we’re creating a “dev”, “uat” and “prd” environment, so lets create the two extra environments.
    * `mkdir -p /etc/puppet/environments/{7_uat,7_prd}/{modules,manifests}`
 * <b>NB:</b> You should go back and use clone-create-repo-group.sh to create the Pulp repo group if the environment is newer than the ones created. See Pulp Server section. <- this should be done first
-* Now that we're finished the 7_dev or dev environment we can clone this to the 7_uat and 7_prd. Change the SERVER, USER and PASS variables in clone-os-hg.py
+* Now that we're finished the 7_dev or dev environment we can clone this to the 7_uat and 7_prd. Change the SERVER, USER and PASS variables in [clone-os-hg.py](https://github.com/gdbc/CII/blob/master/cii/foreman/clone-os-hg.py)
 	Make sure the part of the name matches the environment:
             
 	* Create the uat env from dev:
@@ -364,13 +364,13 @@ cp /tmp/post_ci_repo_sync.xml /var/lib/jenkins/jobs/post-ci-promotion/config.xml
 chown jenkins.jenkins -R /var/lib/jenkins/jobs/
 systemctl restart jenkins
 ```
-* Create an ssh key for the jenkins user and add it to the foreman kickstart templates(ks-7) for so we can use remote commands later in the CI process to run remove commands, puppet etc
+* Create an ssh key for the jenkins user and add it to the foreman kickstart templates([ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7)) for so we can use remote commands later in the CI process to run remove commands, puppet etc
 ```
 usermod jenkins -s /bin/bash
 su - jenkins
 ssh-keygen -t dsa (hit enter on everything asked)
 ```
-* Capture contents of /var/lib/jenkins/.ssh/id_dsa.pub and insert it into the ks-7 kickstart template in the %post section:
+* Capture contents of /var/lib/jenkins/.ssh/id_dsa.pub and insert it into the [ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7) kickstart template in the %post section:
 ```
 mkdir -p /root/.ssh/
 cat << EOF >> /root/.ssh/authorized_keys
