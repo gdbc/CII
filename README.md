@@ -197,7 +197,7 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
 
 | Name                      | Path	                                                         | OS Family |    
 | ------------------------- | ------------------------------------------------------------- | --------- |
-| base-7_dev	               | 'http://cii-pulp.ci.com/pulp/repos/base-7_dev/' 	             | Red Hat   |
+| base-7_dev	               | (http://cii-pulp.ci.com/pulp/repos/base-7_dev/) 	             | Red Hat   |
 | epel-7_dev	               | http://cii-pulp.ci.com/pulp/repos/epel-7_dev/                 | Red Hat   |
 | extras-7_dev	             | http://cii-pulp.ci.com/pulp/repos/extras-7_dev/	              | Red Hat	  |
 | foreman-7_dev             | http://cii-pulp.ci.com/pulp/repos/foreman-7_dev/	             | Red Hat	  |
