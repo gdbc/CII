@@ -50,7 +50,7 @@ This server hosts the CII systems and needs to be enabled for  Foreman to  acces
 
 <b><u>SPECS:</u></b>
 * Name: core.ci.com
-* Storage: mount: /var/lib/libvirt/images size: 1TB
+* Storage: Mount: /var/lib/libvirt/images Size: 1TB
 * Memory: 32GB
 
 We dont have too much to do here except open up a port for foreman to use and to do this we need to edit <b>/etc/libvirt/libvirtd.conf</b>
@@ -81,7 +81,7 @@ Here we setup a cron job (<<cron-yum-repo-sync.sh>>) to continually sync from ou
 
 <b><u>SPECS:</u></b>
 * Name: cii-repo.ci.com
-* Storage: mount: /var/www/html size: 100GB
+* Storage: Mount: /var/www/html Size: 100GB
 * Memory: 4GB
 
 <b><u>Scripts:</u></b>
