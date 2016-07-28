@@ -228,18 +228,18 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
 ```
 
 * Configure Subnets
-     Infrastructure -> Subnets -> New Subnet
-     Name: base-network
-     Network address: <your network address>
-     Network mask: <your netmask>
-     Gateway address: <your gateway>
-     Primary DNS: <ip of foreman server>
-     Boot Mode: DHCP
-     Domain: ci.com
-     TFTP Proxy: ci-foreman.ci.com
-     DNS/Reverse Proxy: leave blank else you may find yourself editing zone files
-     NB: Because this is on a host that runs libvirt and serves dhcp we need to edit that config to point pxe boots to this foreman server
-     On the libvirtd host server run:
-     virsh net-edit default
-     Add: “<bootp file='/pxelinux.0' server='<ip of foreman server>'/>” between the <dhcp> tag
+     * Infrastructure -> Subnets -> New Subnet
+     * Name: base-network
+     * Network address: <your network address>
+     * Network mask: <your netmask>
+     * Gateway address: <your gateway>
+     * Primary DNS: <ip of foreman server>
+     * Boot Mode: DHCP
+     * Domain: ci.com
+     * TFTP Proxy: ci-foreman.ci.com
+     * DNS/Reverse Proxy: leave blank else you may find yourself editing zone files
+     * NB: Because this is on a host that runs libvirt and serves dhcp we need to edit that config to point pxe boots to this foreman server
+     * On the libvirtd host server run:
+     * virsh net-edit default
+     * Add: “<bootp file='/pxelinux.0' server='<ip of foreman server>'/>” between the <dhcp> tag
        
