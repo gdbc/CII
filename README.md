@@ -326,7 +326,7 @@ The Jenkins server is the orchestrator of all of our jobs and the backbone to th
 * GIT post-receive hook: post-receive
 
 <b><u>To Do:</u></b> 
-* Install Jenkins and support packages
+* Install Jenkins and support packages:
 ```
 yum install java jenkins python-requests python-paramiko git -y
 systemctl enable jenkins
@@ -334,3 +334,15 @@ systemctl start jenkins
 ```
 You may need to edit /etc/sysconfig/jenkins and set the following if you dont see java running on port 8080:
 `JENKINS_AJP_PORT="-1"`
+* Connect to Jenkins Server: `http://cii-jenkins.ci.com:8080/`
+* Set the admin password to “admin” 
+* Install the following plugins from: Jenkins -> Manage Jenkins -> Manage Plugins
+  * <b><u>Note:</u></b> These plugins must be installed before coying the jenkins jobs `config` files into place
+  * TAP
+  * Python Plugin
+  * Parameterized Remote Trigger Plugin
+  * Parameterized Trigger Plugin
+  * Build Authorization Token Root Plugin
+  * Workspace Cleanup Plugin
+
+
