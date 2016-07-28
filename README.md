@@ -416,6 +416,22 @@ EOF
             ├── manifests
             └── modules
   ```
-  
+* Populate your repo with your puppet modules and bats code to resemble the above
+* Add the git post-receive hook on the server in project/hooks and make it executable. 
+* This hook will kick off jenkins jobs for each environment 7_dev,7_uat or 7_prd environments when a “git post” is run. It will do the same for bat test updates for 7_dev, though each jenkins run will pull a fresh copy of bats and run it. The bats tests are not segmented between environments like the puppet environments.
+* The variable `“JENKINS_SERVER"` and possibly `"JENKINS_PROJECT"` and `"JENKINS_PROJECT_TOKEN"` will need to be edited to coincide with the parameters set in the jenkins job
 
+That's it, you're done and ready to initialize jobs via adding/editing BAT tests to the git repo or by adding modules to puppets git repo. This will trigger the post-commit script which in turn will trigger the cii-run job on the jenkins server.
+
+The cron job on the repo server(cron-yum-repo-sync.sh) will sync from upstream yum repos. 
+
+The cron jobs on the pulp server (pulp-env-diff-check-dev.py, pulp-env-diff-check-uat.py, pulp-env-diff-check-prd.py… or one for each environment) will sync from the repo server and diff against the pulp repositories where if it finds a diff for dev(between 7_master and 7_dev), diff to uat(between 7_dev and 7_uat) and lastly diff to prd(between 7_uat to 7_prd).
+
+If a Jenkins job fails the test system used to run the job will stay up for troubleshooting purposes. Bare in mind if a system is up and there are no more test systems in the pool the “cii-run” job will fail.
+
+Happy to chat!
+
+Cheers,
+
+gdbc
 
