@@ -149,14 +149,14 @@ What we’re doing here is setting up the first environment(7_dev) and from ther
 
 <b><u>Scripts:</u></b>
 * Configure yum repos: create-cii-server-repos.sh
-* Kickstart-template: <ks-7>
+* Kickstart-template: ks-7
 * Clone Env: clone-os-hg.py
 
 
 <b><u>To Do:</u></b>
 
 * Edit the server entry in create-cii-server-repos.sh and run it to setup the yum repos to get our install and upstream packages
-* Install foreman:
+* Install Foreman:
 ```
 yum install foreman-installer git python-requests -y 
 foreman-installer  --enable-foreman-proxy --foreman-proxy-dns=true --enable-foreman-compute-libvirt --foreman-configure-epel-repo false --foreman-configure-scl-repo false (epel and scl are disabled here as they sync’d and added via create-cii-server-repos.sh)
