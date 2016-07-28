@@ -231,9 +231,9 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
      * Infrastructure -> Subnets -> New Subnet
      * Name: base-network
      * Network address: <your network address>
-     * Network mask: <your netmask>
-     * Gateway address: <your gateway>
-     * Primary DNS: <ip of foreman server>
+     * Network mask: `<your netmask>`
+     * Gateway address: `<your gateway>`
+     * Primary DNS: `<ip of foreman server>`
      * Boot Mode: DHCP
      * Domain: ci.com
      * TFTP Proxy: ci-foreman.ci.com
