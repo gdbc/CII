@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# This script is the git trigger that kicks off the Jenkins project which runs the jobs you've included that tests your automated builds
+
+COMMIT_STRING=`git log -r --name-only -n1 --no-commit-id|head -n1`
+JENKINS_SERVER="cii-jenkins.ci.com"
+JENKINS_PROJECT="cii-run"
+JENKINS_PROJECT_TOKEN="cii-run"
+
+if [[ $COMMIT_STRING =~ "bats" ]]
+then
+    # NOTE: Add environment for bats, so we can bypass an lengthy repo sync 
+    curl --data "token=$JENKINS_PROJECT_TOKEN&SRC_ENV=7_master&DST_ENV=7_dev&SYNC_ENV=no" http://$JENKINS_SERVER:8080/job/$JENKINS_PROJECT/buildWithParameters
+elif [[ $COMMIT_STRING =~ "puppet" ]]
+then
+    PUPPET_ENV=`echo $COMMIT_STRING | cut -d/ -f3`
+    if   [[ $PUPPET_ENV == "7_dev" ]]
+    then
+        curl --data "token=$JENKINS_PROJECT_TOKEN&SRC_ENV=7_master&DST_ENV=7_dev&SYNC_ENV=no" http://$JENKINS_SERVER:8080/job/$JENKINS_PROJECT/buildWithParameters
+    elif [[ $PUPPET_ENV == "7_uat" ]]
+    then
+        curl --data "token=$JENKINS_PROJECT_TOKEN&SRC_ENV=7_dev&DST_ENV=7_uat&SYNC_ENV=no" http://$JENKINS_SERVER:8080/job/$JENKINS_PROJECT/buildWithParameters
+    elif [[ $PUPPET_ENV == "7_prd" ]]
+    then
+        curl --data "token=$JENKINS_PROJECT_TOKEN&SRC_ENV=7_uat&DST_ENV=7_prd&SYNC_ENV=no" http://$JENKINS_SERVER:8080/job/$JENKINS_PROJECT/buildWithParameters
+    fi
+fi

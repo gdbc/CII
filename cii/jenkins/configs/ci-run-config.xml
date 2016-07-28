@@ -1,0 +1,1284 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>check if master and eng has a diff&#xd;
+&#xd;
+to run this project:&#xd;
+&#xd;
+curl --data &quot;token=ci-run&amp;SRC_ENV=master&amp;DST_ENV=eng&amp;SYNC_ENV=yes/no&quot; http://ci-jenkins.example.com:8080/job/ci-run/buildWithParameters </description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>SRC_ENV</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>DST_ENV</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>SYNC_ENV</name>
+          <description></description>
+          <defaultValue>yes</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <authToken>cii-run</authToken>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import os
+import sys
+import json
+import requests
+from userpass import userpass
+requests.packages.urllib3.disable_warnings()
+from requests.auth import HTTPBasicAuth
+import urllib3
+urllib3.disable_warnings()
+
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;Creating RPM DIFF FROM SOURCE AND DESTINATION REPO GROUPS&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+SERVER   = userpass().creds()[&apos;pulp&apos;][&apos;server&apos;]
+URL      = &quot;https://&quot; + SERVER + &quot;/pulp/api/v2/repositories/&quot;
+USER     = userpass().creds()[&apos;pulp&apos;][&apos;user&apos;]
+PASS     = userpass().creds()[&apos;pulp&apos;][&apos;passwd&apos;]
+SRC_ENV  = os.getenv(&apos;SRC_ENV&apos;)
+DST_ENV  = os.getenv(&apos;DST_ENV&apos;)
+SYNC_ENV = os.getenv(&apos;SYNC_ENV&apos;)
+REPOS    = requests.get(URL,auth=HTTPBasicAuth(USER, PASS),verify=False).json()
+
+# Get repo packages sorted out 
+
+def get_repos(src_env, dst_env, repositories):
+   src_dict=[]
+   dst_dict=[]
+   for repo in repositories:
+      if src_env in repo[&apos;id&apos;]:
+         src_dict.append(repo[&apos;id&apos;])
+      elif dst_env in repo[&apos;id&apos;]:
+         dst_dict.append(repo[&apos;id&apos;])
+   return src_dict,dst_dict
+
+def get_short_env_rpms(repos_array, server, user, password):
+   ARR   = {}
+   for repo in repos_array:
+      URL = &quot;https://&quot; + server + &quot;/pulp/api/v2/repositories/&quot; + repo + &quot;/search/units/&quot;
+      DST = {&quot;criteria&quot;: {&quot;fields&quot;: {&quot;unit&quot;: [&quot;name&quot;,&quot;filename&quot;]},&quot;type_ids&quot;: [&quot;rpm&quot;]}}
+      REQ = requests.post(URL,auth=HTTPBasicAuth(user, password),data=json.dumps(DST),verify=False).json(
+)
+      for rpm in REQ:
+         ARR[str(rpm[&quot;metadata&quot;][&quot;filename&quot;])] = rpm[&quot;metadata&quot;][&quot;name&quot;]
+   return ARR
+
+def get_diff_rpms_short(src_rpms, dst_rpms):
+   diff_rpms = []
+   for x in src_rpms.keys():
+      if x not in dst_rpms.keys():
+         diff_rpms.append(src_rpms[x])
+   return diff_rpms
+
+def get_long_env_rpms(repos_array, server, user, password):
+   ARR = []
+   for repo in repos_array:
+      URL = &quot;https://&quot; + server + &quot;/pulp/api/v2/repositories/&quot; + repo + &quot;/search/units/&quot;
+      DST = {&quot;criteria&quot;: {&quot;fields&quot;: {&quot;unit&quot;: [&quot;filename&quot;]},&quot;type_ids&quot;: [&quot;rpm&quot;]}}
+      REQ = requests.post(URL,auth=HTTPBasicAuth(user, password),data=json.dumps(DST),verify=False).json()
+      for rpm in REQ:
+         ARR.append(rpm[&quot;metadata&quot;][&quot;filename&quot;])
+   return ARR
+
+def get_diff_rpms_long(src_rpms, dst_rpms):
+   diff_rpms = []
+   for x in src_rpms:
+      if x not in dst_rpms:
+         diff_rpms.append(x)
+   return diff_rpms
+
+# Create a json file containing short and long filenames
+
+# Get Long RPM Names
+
+if SYNC_ENV == &quot;no&quot;:
+   print &quot;SKIPPING REPO SYNC!&quot;
+   sys.exit(0)
+
+LONG_DICT                         = {}
+SRC_DICT_LONG, DST_DICT_LONG      = get_repos(SRC_ENV,DST_ENV, REPOS)
+SRC_RPMS_ALL_LONG                 = get_long_env_rpms(SRC_DICT_LONG, SERVER, USER, PASS)
+DST_RPMS_ALL_LONG                 = get_long_env_rpms(DST_DICT_LONG, SERVER, USER, PASS)
+DIFF_LIST_LONG                    = get_diff_rpms_long(SRC_RPMS_ALL_LONG, DST_RPMS_ALL_LONG)
+LONG_DICT[&apos;long&apos;]                 = DIFF_LIST_LONG 
+
+
+# Check if there are any diffs if not, exit
+
+if not DIFF_LIST_LONG:
+   pass
+
+# Get Short RPM Names
+
+SHORT_DICT                        = {}
+SRC_DICT_SHORT, DST_DICT_SHORT    = get_repos(SRC_ENV,DST_ENV,REPOS)
+SRC_RPMS_ALL_SHORT                = get_short_env_rpms(SRC_DICT_SHORT, SERVER, USER, PASS)
+DST_RPMS_ALL_SHORT                = get_short_env_rpms(DST_DICT_SHORT, SERVER, USER, PASS)
+DIFF_LIST_SHORT                   = get_diff_rpms_short(SRC_RPMS_ALL_SHORT,DST_RPMS_ALL_SHORT)
+SHORT_DICT[&apos;short&apos;]               = DIFF_LIST_SHORT 
+
+#print &quot; &quot;.join(list(set(full_list)))
+MASTER_DICT = {}
+MASTER_DICT[SHORT_DICT.keys()[0]] = SHORT_DICT[&apos;short&apos;]
+MASTER_DICT[LONG_DICT.keys()[0]]  = LONG_DICT[&apos;long&apos;]
+print &quot;Installing packages will be installed: &quot;
+print &quot;\n&quot;.join(LONG_DICT[&apos;long&apos;])
+file  = open(&apos;packages.txt&apos;,&apos;a&apos;)
+file.write(json.dumps(MASTER_DICT))
+file.close()
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINISHED Creating RPM DIFF FROM SOURCE AND DESTINATION REPO GROUPS&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import os
+import sys
+import time
+import json
+import requests
+from userpass import userpass
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINDING AVAILABLE SYSTEM!&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+HOST_GROUP    = &quot;hg-&quot; + os.getenv(&apos;DST_ENV&apos;)
+USER          = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASSWD        = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+SERVER        = userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+
+
+def get_hosts(hgroup, server, user, password):
+    hostlist  = {}
+    hg_id     = &quot;&quot;
+    url       = &quot;https://&quot; + server + &quot;/api/v2/hostgroups/&quot; + hgroup + &quot;/hosts&quot;
+    r         = requests.get(url,auth=(user,password),verify=False).json()
+    for i in r[&apos;results&apos;]:
+       hostlist[i[&apos;name&apos;]] = i[&apos;id&apos;]
+       hg_id = i[&apos;hostgroup_id&apos;]
+    return hostlist,hg_id
+
+
+def host_on(host, server, user, password):
+    hoston    = True
+    p         = {&quot;power_action&quot;:&quot;state&quot;}
+    url       = &quot;http://&quot; + server + &quot;/api/v2/hosts/&quot; + host + &quot;/power&quot;
+    h         = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    r         = requests.put(url,auth=(user,password),params=p,headers=h,verify=False)
+    if r.json()[&apos;power&apos;] == &quot;shutoff&quot;:
+       hoston = False
+    return hoston
+
+def get_osid(hgroup_id, server, user, password):
+    hg_id     = &quot;&quot;
+    url       = &quot;https://&quot; + server + &quot;/api/v2/hostgroups/&quot; + str(hgroup_id)
+    r         = requests.get(url,auth=(user,password),verify=False)
+    os_name   = r.json()[&apos;operatingsystem_id&apos;]
+    return os_name
+
+def update_host_osid(os_id, host_id, server, user, password):
+    url       = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + str(host_id)
+    h         = {&quot;Accept&quot;: &quot;application/json&quot;,&quot;Content-Type&quot;:&quot;application/json&quot;}
+    p         = {&quot;host&quot;: {&quot;operatingsystem_id&quot;: str(os_id)}}
+    r         = requests.put(url,auth=(user,password),data=json.dumps(p),headers=h,verify=False)
+    
+HOST_FOUND               = False
+HOST_LIST, HOST_GROUP_ID = get_hosts(HOST_GROUP, SERVER, USER, PASSWD)
+OS_ID                    = get_osid(HOST_GROUP_ID, SERVER, USER, PASSWD)
+
+for hst in HOST_LIST.keys():
+   if not host_on(hst, SERVER, USER, PASSWD):
+      print &quot;%-20s status: on id: %s&quot; %(hst, HOST_LIST[hst])
+      file = open(&quot;hostid&quot;,&quot;w&quot;)
+      file.write(str(HOST_LIST[hst]))
+      file.close()
+      file = open(&quot;host&quot;,&quot;w&quot;)
+      file.write(str(hst))
+      file.close()
+      print &quot;Found Server: &quot;, SERVER
+      HOST_FOUND = True
+      update_host_osid(OS_ID, HOST_LIST[hst], SERVER, USER, PASSWD)
+      break
+
+if not HOST_FOUND:
+      print &quot;All hosts seem to be busy, failing job for reschedule!&quot;
+      sys.exit(-1)
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINISHED FINDING AVAILABLE SYSTEM&quot;
+print &quot;&quot;
+print &quot;&quot;
+</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import requests
+import json
+from userpass import userpass
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;STARTING BUILD&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+HOSTID    = open(&quot;hostid&quot;,&quot;r&quot;).readline()
+SERVER    = userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+USER      = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASS      = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+
+url       = &quot;https://&quot; + SERVER + &quot;/api/v2/hosts/&quot; + HOSTID
+p         = {&quot;host&quot;:{&quot;build&quot;:True}}
+h         = {&quot;Accept&quot;: &quot;application/json&quot;,&quot;Content-Type&quot;:&quot;application/json&quot;}
+r         = requests.put(url,auth=(USER,PASS),data=json.dumps(p),headers=h, verify=False)
+
+print &quot;request to build host:&quot;,r.text
+
+url       = &quot;http://&quot; + SERVER + &quot;/api/v2/hosts/&quot; + HOSTID + &quot;/power&quot;
+p         = {&quot;power_action&quot;:&quot;start&quot;}
+r         = requests.put(url,auth=(USER,PASS),params=p,headers=h, verify=False)
+
+print &quot;restart status code: %s&quot; %r.status_code
+print &quot;Start Status: %s&quot; %r.text
+if str(r.status_code) == &quot;500&quot;:
+    p     = {&quot;power_action&quot;:&quot;start&quot;}
+    r     = requests.put(url,auth=(USER,PASS),params=p,headers=h)
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINISHED STARTING BUILD&quot;
+print &quot;&quot;
+print &quot;&quot;</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import sys
+import time
+import socket
+import paramiko
+import requests
+from userpass import userpass
+
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;STARTING WAIT SCRIPT&quot; 
+print &quot;&quot;
+print &quot;&quot;
+
+
+USER      = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASS      = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+SSH_USER  = userpass().creds()[&apos;ssh&apos;][&apos;user&apos;]
+SSH_PASS  = userpass().creds()[&apos;ssh&apos;][&apos;passwd&apos;]
+SERVER    = userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+HOSTID    = open(&quot;hostid&quot;,&quot;r&quot;).readline()
+HOSTNAME  = open(&quot;host&quot;,&quot;r&quot;).readline()
+TIME_WAIT = 60
+TIME_LIM  = 1800
+TOT_WAIT  = 60
+
+
+def get_status(hostname, server, user, password):
+    p     = {&quot;power_action&quot;:&quot;state&quot;}
+    h     = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    url   = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostname + &quot;/power&quot;
+    r     = requests.put(url, auth=(user, password), params=p, headers=h, verify=False)
+    return r.json()[&apos;power&apos;]
+
+  
+def start_host(hostname, server, user, password):
+    p     = {&quot;power_action&quot;:&quot;start&quot;}
+    h     = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    url   = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostname + &quot;/power&quot;
+    r     = requests.put(url, auth=(user, password), params=p, headers=h, verify=False)
+    time.sleep(10)
+    if r.status_code == 200:
+         return True
+    else:
+         return False
+
+      
+def check_ssh(hostname,ssh_user,ssh_pass):
+    try:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname,username=ssh_user,password=ssh_pass)
+        return True
+    except Exception as e:
+        return False
+
+      
+while True:
+    status    = get_status(HOSTID, SERVER, USER, PASS)
+    if status == &quot;shutoff&quot;:
+        start = start_host(HOSTID, SERVER, USER, PASS)
+        if not start:
+           print &quot;cannot start system!&quot;
+           sys.exit(1)
+    else:
+        if check_ssh(HOSTNAME, SSH_USER, SSH_PASS):
+            print &quot;ssh is up, exiting!&quot;
+            break
+    time.sleep(TIME_WAIT)
+    TOT_WAIT+=60
+    if TOT_WAIT == TIME_LIM:
+        print &quot;Waited &quot; + str(TOT_WAIT) + &quot; seconds for system to start, giving up!&quot;
+        sys.exit(1)
+        
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINISHED WAIT SCRIPT&quot; 
+print &quot;&quot;
+print &quot;&quot;
+</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import os
+import sys
+import time
+import requests
+import paramiko
+from userpass import userpass
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;RUNNING PUPPET!&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+HOSTID       = open(&quot;hostid&quot;,&quot;r&quot;).readline()
+HOSTNAME     = open(&quot;host&quot;,&quot;r&quot;).readline()
+ENV          = os.getenv(&apos;DST_ENV&apos;)
+USER         = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASS         = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+SSH_USER     = userpass().creds()[&apos;ssh&apos;][&apos;user&apos;]
+SSH_PASS     = userpass().creds()[&apos;ssh&apos;][&apos;passwd&apos;]
+SERVER       = userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+TIME_LIM     = 600
+TIME_WAIT    = 60
+TOT_WAIT     = 60
+
+
+def get_status(hostid, server, user, password):
+    url      = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostid + &quot;/status&quot;
+    r        = requests.get(url,auth=(user, password),verify=False)
+    status   = r.json()[&apos;status&apos;]
+    if status != &quot;Active&quot;:
+       return False
+
+
+def exec_puppet(environment, target, time_wait, server, ssh_user, ssh_pass):
+    client      = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(target, username=ssh_user, password=ssh_pass)
+    stdin, stdout, stderr = client.exec_command(&quot;puppet agent -t --server=&quot; + server + &quot; --environment=&quot; + environment + &quot; --debug --onetime&quot;)
+    print &quot;Sleeping for &quot; + str(time_wait) + &quot; for puppet checkin&quot;
+    time.sleep(60)
+    exit_status =  stdout.channel.recv_exit_status()
+    print &quot;exit status: %s&quot; %(exit_status)
+    #if exit_status != 0:
+    #NEEDS FIXING PUPPET EXIT CODE
+    if exit_status == 0 or exit_status == 6:
+        print &quot;True&quot;
+        return True
+    else:
+        print &quot;False&quot;
+        return False
+
+         
+def check_running(hostid, server, user, password):
+    url      = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostid + &quot;/power&quot;
+    p        = {&quot;power_action&quot;:&quot;state&quot;}
+    h        = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    r        = requests.put(url, auth=(user, password), params=p, headers=h, verify=False)
+    if r.json()[&apos;power&apos;] == &quot;running&quot;:
+       return True
+    else:
+       return False
+
+
+while True:
+    if not check_running(HOSTID, SERVER, USER, PASS):
+        print &quot;%s not running, exiting!&quot; %(HOSTNAME)
+        sys.exit(1)
+    if not get_status(HOSTID, SERVER, USER, PASS):
+        puppet_run = exec_puppet(ENV, HOSTNAME, TIME_WAIT, SERVER, SSH_USER, SSH_PASS)
+        if not puppet_run:
+            time.sleep(TIME_WAIT)
+        else:
+            print &quot;Puppet run successful, exiting!&quot;
+            break
+    else:
+        print &quot;Puppet run successful, exiting!&quot;
+        break
+    TOT_WAIT+=60
+    print &quot;Waiting an extra minute!&quot;
+    if TOT_WAIT == TIME_LIM:
+        print &quot;Waited &quot; + str(TOT_WAIT) + &quot; seconds for puppet to run without error, exiting!&quot;
+        break
+        
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINISHED RUNNING PUPPET!&quot;
+print &quot;&quot;
+print &quot;&quot;
+</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command># This script assumes you have a pulp feed configured and syncs repositories in a repo group
+# and waits for the sync to complete
+import os
+import sys
+import json
+import time
+import requests
+from userpass import userpass
+from requests.auth import HTTPBasicAuth
+requests.packages.urllib3.disable_warnings()
+
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;STARTING REPO SYNC!&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+
+USER       = userpass().creds()[&apos;pulp&apos;][&apos;user&apos;]
+PASS       = userpass().creds()[&apos;pulp&apos;][&apos;passwd&apos;]
+SERVER     = userpass().creds()[&apos;pulp&apos;][&apos;server&apos;]
+SRC_ENV    = os.getenv(&apos;SRC_ENV&apos;)
+DST_ENV    = os.getenv(&apos;DST_ENV&apos;)
+SYNC_ENV   = os.getenv(&apos;SYNC_ENV&apos;)
+URL        = &quot;https://&quot; + SERVER + &quot;/pulp/api/v2/repo_groups/&quot; + DST_ENV + &quot;/&quot;
+TASK_ARRAY = []
+SYNCED     = True
+SLEEP      = 10
+TIMEOUT    = 4800
+TOTALTIME  = 0
+
+
+if SYNC_ENV == &quot;no&quot;:
+   print &quot;SKIPPING REPO SYNC!&quot;
+   sys.exit(0)
+
+# Get list of repos to compare unit counts
+
+
+REPO_URL   = &quot;https://&quot; + SERVER + &quot;/pulp/api/v2&quot;
+REPOS      = requests.get(REPO_URL + &quot;/repositories/&quot;,auth=HTTPBasicAuth(USER, PASS),verify=False).json()
+
+
+def checkRepoDiff(srcReps, dstReps, reps):
+    src_count = 0
+    dst_count = 0
+    for rep in reps:
+        if str(srcReps).strip() == str(rep[&apos;id&apos;]).strip():
+            src_count = rep[&apos;content_unit_counts&apos;][&apos;rpm&apos;]
+        if str(dstReps).strip() == str(rep[&apos;id&apos;]).strip():
+            dst_count = rep[&apos;content_unit_counts&apos;][&apos;rpm&apos;]
+    if src_count &lt; dst_count:
+        return True
+    else:
+        return False
+
+      
+def checkTask(tId, repo_url, server, user, password):
+    SERVER   = repo_url + &quot;/tasks/&quot; + tId + &quot;/&quot;
+    tIdCheck = requests.get(SERVER, auth=HTTPBasicAuth(user, password),verify=False)
+    state    = json.loads(tIdCheck.text)
+    if state[&apos;state&apos;] == &quot;finished&quot;:
+       return True
+    else:
+       return False
+
+      
+def wait_for_task(task_array, sleep, repo_url, server, user, password):
+    TOTALTIME = 0
+    SYNCED    = True
+    for task in task_array:
+        print &quot;Checking task:&quot;, task
+        while SYNCED:
+            if not checkTask(task, repo_url, server, user, password):
+                print &quot;sleeping for&quot;,SLEEP
+                time.sleep(SLEEP)
+                TOTALTIME = TOTALTIME + SLEEP
+                continue
+            else:
+                print &quot;task %s completed&quot; %task
+                break
+        if TOTALTIME == TIMEOUT:
+            print &quot;Sync is taking too long, failing&quot;
+            SYNCED = False
+        print &quot;TOTALTIME IS&quot;,TOTALTIME
+    print &quot;Finished task wait&quot;
+    return SYNCED
+  
+
+REPO_GROUPS = requests.get(URL, auth=HTTPBasicAuth(USER, PASS), verify=False).json()
+
+
+for repo in REPO_GROUPS[&apos;repo_ids&apos;]:
+    if checkRepoDiff(repo,repo.replace(DST_ENV, SRC_ENV), REPOS):
+        req  = {&quot;source_repo_id&quot;: repo.replace(DST_ENV, SRC_ENV), &apos;criteria&apos;:  {&quot;type_ids&quot;: [&apos;rpm&apos;]},&quot;override_config&quot;: {&quot;verify_checksum&quot;: False,&quot;verify_size&quot;: False}}
+        url  = REPO_URL + &quot;/repositories/&quot; + str(repo).strip() + &quot;/actions/associate/&quot;
+        sync = requests.post(url,auth=HTTPBasicAuth(USER, PASS),data=json.dumps(req),verify=False)
+        print sync.text
+        print sync.status_code
+        if str(sync.status_code).strip() == &quot;202&quot;:
+            TASK_ARRAY.append(json.loads(sync.text)[&apos;spawned_tasks&apos;][0][&apos;task_id&apos;])
+        else:
+            print &quot;sync failure code on repo: %s&quot; %repo
+            sys.exit(1)
+
+wait_for_sync = wait_for_task(TASK_ARRAY, SLEEP, REPO_URL, SERVER, USER, PASS)
+
+if wait_for_sync:
+    id = {&quot;id&quot;: &quot;yum_distributor&quot;, &quot;override_config&quot;: {}}
+    for pubrepo in REPO_GROUPS[&apos;repo_ids&apos;]:
+        print &quot;Publishing repo:&quot;, pubrepo
+        url = &quot;https://&quot; + SERVER + &quot;/pulp/api/v2/repositories/&quot; + str(pubrepo).strip() + &quot;/actions/publish/&quot;
+        pub = requests.post(url,auth=HTTPBasicAuth(USER, PASS),data=json.dumps(id),verify=False)
+        print pub.text
+        print pub.status_code
+        if str(pub.status_code).strip() == &quot;202&quot;:
+            TASK_ARRAY.append(json.loads(pub.text)[&apos;spawned_tasks&apos;][0][&apos;task_id&apos;])
+        else:
+            print &quot;sync failure code on repo: %s&quot; %pubrepo
+            sys.exit(1)
+
+wait_for_sync = wait_for_task(TASK_ARRAY, SLEEP, REPO_URL, SERVER, USER, PASS)
+
+
+            
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINISHING REPO SYNC!&quot;
+print &quot;&quot;
+print &quot;&quot;
+</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import os
+import sys
+import json
+import time
+import requests
+import paramiko
+from userpass import userpass
+
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;INSTALLING PACKAGES!&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+
+USER          = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASS          = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+SSH_USER      = userpass().creds()[&apos;ssh&apos;][&apos;user&apos;]
+SSH_PASS      = userpass().creds()[&apos;ssh&apos;][&apos;passwd&apos;]
+FILE          = &quot;packages.txt&quot;
+SERVER        = userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+HOSTID        = open(&quot;hostid&quot;,&quot;r&quot;).readline()
+HOSTNAME      = open(&quot;host&quot;,&quot;r&quot;).readline()
+SYNC_ENV      = os.getenv(&apos;SYNC_ENV&apos;)
+TIME_LIM      = 300
+TIME_WAIT     = 60
+TOT_WAIT      = 0
+
+
+if SYNC_ENV   == &quot;no&quot;:
+   print &quot;SKIPPING INSTALLING PACKAGES!&quot;
+   sys.exit(0)
+
+    
+READ_FILE     = json.load(open(FILE,&apos;r&apos;))
+PKGS          = &quot; &quot;.join(READ_FILE[&apos;short&apos;])
+print &quot;Installing packages: %s&quot; %&quot; &quot;.join(READ_FILE[&apos;long&apos;])
+
+
+def get_status(hostid, server, user, password):
+    url       = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostid + &quot;/status&quot;
+    r         = requests.get(url,auth=(user, password), verify=False)
+    status    = r.json()[&apos;status&apos;]
+    if status != &quot;Active&quot;:
+       return False
+
+      
+def install_pkgs(pkgs, time_wait, target, server, ssh_user, ssh_pass):
+    client    = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(target,username=ssh_user,password=ssh_pass, timeout=TIME_LIM)
+    # Clean yum, might want to wrap an exception around this at some point
+    client.exec_command(&quot;yum clean all&quot;)
+    print &quot;\n Running: yum install -y %s&quot; %pkgs
+    stdin, stdout, stderr = client.exec_command(&quot;yum install -y &quot; + pkgs)
+    out = stdout.read()
+    print &quot;Sleeping for &quot; + str(time_wait) + &quot; for install to complete!&quot;
+    time.sleep(60)
+    exit_status =  stdout.channel.recv_exit_status()
+    print &quot;exit status: %s&quot; %(exit_status)
+    if exit_status != 0:
+        print &quot;Error: %s&quot; %out
+        return False
+    else:
+        return True
+      
+
+def check_running(hostid, server, user, password):
+    url = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostid + &quot;/power&quot;
+    p   = {&quot;power_action&quot;:&quot;state&quot;}
+    h   = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    r   = requests.put(url,auth=(user, password),params=p,headers=h,verify=False)
+    if r.json()[&apos;power&apos;] == &quot;running&quot;:
+        return True
+    else:
+        return False
+
+if PKGS:
+    while True:
+        if not check_running(HOSTID, SERVER, USER, PASS):
+            print &quot;%s not running, exiting!&quot; %(HOSTNAME)
+            sys.exit(1)
+        if not get_status(HOSTID, SERVER, USER, PASS):
+            ins_pkgs = install_pkgs(PKGS, TIME_WAIT, HOSTNAME, SERVER, SSH_USER, SSH_PASS)
+            if not ins_pkgs:
+                print &quot;Sleeping for another &quot; + str(TIME_WAIT) + &quot; seconds!&quot;
+                time.sleep(TIME_WAIT)
+            else:
+                print &quot;yum install successful, exiting!&quot;
+                sys.exit(0)
+        else:
+            print &quot;yum install successful, exiting!&quot;
+            break
+        TOT_WAIT+=60
+        print &quot;Waiting an extra minute!&quot;
+        print &quot;TOT_WAIT is: %s&quot; %TOT_WAIT
+        if TOT_WAIT == TIME_LIM:
+            print &quot;Waited &quot; + str(TOT_WAIT) + &quot; seconds for yum to install, exiting with failure!&quot;
+            sys.exit(1)
+else:
+    print &quot;No packages to install, skipping!&quot;
+    print &quot;&quot;
+    print &quot;&quot;
+    print &quot;INSTALLING PACKAGES COMPLETE!&quot;
+    print &quot;&quot;
+    print &quot;&quot;
+    pass
+
+  
+
+</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import os
+import sys
+import time
+import requests
+import paramiko
+from userpass import userpass
+
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;STARTED: SYNCING PUPPET ENVIRONMENT&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+
+ENV              = os.getenv(&apos;DST_ENV&apos;)
+USER             = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASS             = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+SSH_USER         = userpass().creds()[&apos;ssh&apos;][&apos;user&apos;]
+SSH_PASS         = userpass().creds()[&apos;ssh&apos;][&apos;passwd&apos;]
+SERVER           = userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+GIT_SRV          = userpass().creds()[&apos;git&apos;][&apos;server&apos;]
+GIT_USER         = userpass().creds()[&apos;git&apos;][&apos;user&apos;]
+#Note that the below &quot;master&quot; is referencing the HEAD
+GIT_PROJECT_PATH = &quot;/home/git/project master&quot;
+GIT_REPO_PATH    = &quot; puppet/environments/&quot; + ENV
+GIT_DST_PATH     = &quot;/etc/puppet/environments&quot;
+
+# Careful with the below command, GIT_DST_PATH should never be blank
+RUN_CMD          = &quot;rm -rf &quot; + GIT_DST_PATH + &quot;/&quot; + ENV + &quot;;git archive --format tar --remote ssh://&quot; + GIT_USER + &quot;@&quot; + GIT_SRV + GIT_PROJECT_PATH + GIT_REPO_PATH + &quot;| tar xvf - -C &quot; + GIT_DST_PATH + &quot; --strip 2 &quot; + GIT_REPO_PATH
+print &quot;RUN CMD&quot;, RUN_CMD
+SSH_USER         = &quot;root&quot;
+TIME_LIM         = 600
+TIME_WAIT        = 60
+TOT_WAIT         = 60
+
+
+def exec_sync(environment,server, ssh_user, ssh_pass):
+    client      = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(server,username=ssh_user, password=ssh_pass)
+    stdin, stdout, stderr = client.exec_command(RUN_CMD)
+    print &quot;stdin&quot;, stdin
+    print &quot;stdout&quot;, stdout
+    print &quot;stderr&quot;, stderr
+    exit_status =  stdout.channel.recv_exit_status()
+    print &quot;exit status: %s&quot; %(exit_status)
+    if exit_status == 0:
+        return True
+    else:
+        return False
+
+
+def get_proxy_id(server, user, password):
+    url    = &quot;https://&quot; + server + &quot;/api/smart_proxies&quot;
+    h      = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    r      = requests.get(url,auth=(user, password),headers=h, verify=False)
+    for x in r.json()[&apos;results&apos;]:
+       if x[&apos;name&apos;] == server:
+           pxy_id = x[&apos;id&apos;]
+    return str(pxy_id)
+
+
+def get_env_id(environment, server, user, password):
+    url    = &quot;https://&quot; + server + &quot;/api/environments&quot;
+    h      = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    r      = requests.get(url,auth=(user, password),headers=h,verify=False)
+    for x in r.json()[&apos;results&apos;]:
+        if x[&apos;name&apos;] == environment:
+            env_id = x[&apos;id&apos;]
+    return str(env_id)
+      
+
+def sync_env(proxy_id, env_id, server, user, password):
+    hl     = {}
+    url    = &quot;https://&quot; + server + &quot;/api/smart_proxies/&quot; + proxy_id + &quot;/environments/&quot; + env_id + &quot;/import_puppetclasses&quot;
+    h      = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    result = requests.post(url,auth=(user, password),headers=h, verify=False)
+    return result.ok
+
+         
+sync_run = exec_sync(ENV,SERVER, SSH_USER, SSH_PASS)
+if sync_run:
+            print &quot;Sync run successfully, syncing Foreman puppet environment!&quot;
+            PROXY_ID = get_proxy_id(SERVER, USER, PASS)
+            ENV_ID   = get_env_id(ENV, SERVER, USER, PASS)
+            SYNC_ENV = sync_env(PROXY_ID, ENV_ID, SERVER, USER, PASS)
+            if SYNC_ENV == &quot;True&quot;:
+                print &quot;Environment sync successful!&quot;
+                sys.exit(0)
+else:
+            print &quot;Sync run failed, exiting!&quot;
+            sys.exit(1)
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINISHED SYNCING PUPPET ENVIRONMENT!&quot;
+print &quot;&quot;
+print &quot;&quot;
+</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import os
+import sys
+import time
+import requests
+import paramiko
+from userpass import userpass
+
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;RUNNING PUPPET!&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+
+HOSTID       = open(&quot;hostid&quot;,&quot;r&quot;).readline()
+HOSTNAME     = open(&quot;host&quot;,&quot;r&quot;).readline()
+ENV          = os.getenv(&apos;DST_ENV&apos;)
+USER         = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASS         = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+SSH_USER     = userpass().creds()[&apos;ssh&apos;][&apos;user&apos;]
+SSH_PASS     = userpass().creds()[&apos;ssh&apos;][&apos;passwd&apos;]
+SERVER       = userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+TIME_LIM     = 600
+TIME_WAIT    = 60
+TOT_WAIT     = 60
+
+
+def get_status(hostid, server, user, password):
+    url      = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostid + &quot;/status&quot;
+    r        = requests.get(url,auth=(user, password),verify=False)
+    status   = r.json()[&apos;status&apos;]
+    if status != &quot;Active&quot;:
+       return False
+
+
+def exec_puppet(environment, target, time_wait, server, ssh_user, ssh_pass):
+    client      = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(target, username=ssh_user, password=ssh_pass)
+    stdin, stdout, stderr = client.exec_command(&quot;puppet agent -t --server=&quot; + server + &quot; --environment=&quot; + environment + &quot; --debug --onetime&quot;)
+    print &quot;Sleeping for &quot; + str(time_wait) + &quot; for puppet checkin&quot;
+    time.sleep(60)
+    exit_status =  stdout.channel.recv_exit_status()
+    print &quot;exit status: %s&quot; %(exit_status)
+    #if exit_status != 0:
+    #NEEDS FIXING PUPPET EXIT CODE
+    if exit_status == 0 or exit_status == 6:
+        print &quot;True&quot;
+        return True
+    else:
+        print &quot;False&quot;
+        return False
+
+         
+def check_running(hostid, server, user, password):
+    url      = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostid + &quot;/power&quot;
+    p        = {&quot;power_action&quot;:&quot;state&quot;}
+    h        = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    r        = requests.put(url, auth=(user, password), params=p, headers=h, verify=False)
+    if r.json()[&apos;power&apos;] == &quot;running&quot;:
+       return True
+    else:
+       return False
+
+
+while True:
+    if not check_running(HOSTID, SERVER, USER, PASS):
+        print &quot;%s not running, exiting!&quot; %(HOSTNAME)
+        sys.exit(1)
+    if not get_status(HOSTID, SERVER, USER, PASS):
+        puppet_run = exec_puppet(ENV, HOSTNAME, TIME_WAIT, SERVER, SSH_USER, SSH_PASS)
+        if not puppet_run:
+            time.sleep(TIME_WAIT)
+        else:
+            print &quot;Puppet run successful, exiting!&quot;
+            break
+    else:
+        print &quot;Puppet run successful, exiting!&quot;
+        break
+    TOT_WAIT+=60
+    print &quot;Waiting an extra minute!&quot;
+    if TOT_WAIT == TIME_LIM:
+        print &quot;Waited &quot; + str(TOT_WAIT) + &quot; seconds for puppet to run without error, exiting!&quot;
+        break
+        
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINISHED RUNNING PUPPET!&quot;
+print &quot;&quot;
+print &quot;&quot;
+</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import sys
+import requests
+from userpass import userpass
+
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;REBOOTING SCRIPT&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+
+HOSTID  = open(&quot;hostid&quot;,&quot;r&quot;).readline()
+USER    = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASS    = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+SERVER  =  userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+url     = &quot;https://&quot; + SERVER +  &quot;/api/v2/hosts/&quot; + HOSTID + &quot;/power&quot;
+p       = {&quot;power_action&quot;:&quot;reset&quot;}
+h       = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+r       = requests.put(url,auth=(USER,PASS),params=p,headers=h, verify=False)
+if r.json()[&apos;power&apos;]:
+   print &quot;&quot;
+   print &quot;&quot;
+   print &quot;FINISHED REBOOTING SCRIPT&quot;
+   print &quot;&quot;
+   print &quot;&quot;
+else:
+   print &quot;&quot;
+   print &quot;&quot;
+   print &quot;Reboot failed!&quot;
+   sys.exit(1)
+print &quot;&quot;
+print &quot;&quot;
+   </command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import sys
+import time
+import socket
+import paramiko
+import requests
+from userpass import userpass
+
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;STARTING WAIT SCRIPT&quot; 
+print &quot;&quot;
+print &quot;&quot;
+
+
+USER      = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASS      = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+SSH_USER  = userpass().creds()[&apos;ssh&apos;][&apos;user&apos;]
+SSH_PASS  = userpass().creds()[&apos;ssh&apos;][&apos;passwd&apos;]
+SERVER    = userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+HOSTID    = open(&quot;hostid&quot;,&quot;r&quot;).readline()
+HOSTNAME  = open(&quot;host&quot;,&quot;r&quot;).readline()
+TIME_WAIT = 60
+TIME_LIM  = 1800
+TOT_WAIT  = 60
+
+
+def get_status(hostname, server, user, password):
+    p     = {&quot;power_action&quot;:&quot;state&quot;}
+    h     = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    url   = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostname + &quot;/power&quot;
+    r     = requests.put(url, auth=(user, password), params=p, headers=h, verify=False)
+    return r.json()[&apos;power&apos;]
+
+  
+def start_host(hostname, server, user, password):
+    p     = {&quot;power_action&quot;:&quot;start&quot;}
+    h     = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    url   = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostname + &quot;/power&quot;
+    r     = requests.put(url, auth=(user, password), params=p, headers=h, verify=False)
+    time.sleep(10)
+    if r.status_code == 200:
+         return True
+    else:
+         return False
+
+      
+def check_ssh(hostname,ssh_user,ssh_pass):
+    try:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname,username=ssh_user,password=ssh_pass)
+        return True
+    except Exception as e:
+        #print e
+        return False
+
+      
+while True:
+    status    = get_status(HOSTID, SERVER, USER, PASS)
+    if status == &quot;shutoff&quot;:
+        start = start_host(HOSTID, SERVER, USER, PASS)
+        if not start:
+           print &quot;cannot start system!&quot;
+           sys.exit(1)
+    else:
+        if check_ssh(HOSTNAME, SSH_USER, SSH_PASS):
+            print &quot;ssh is up, exiting!&quot;
+            break
+    time.sleep(TIME_WAIT)
+    TOT_WAIT+=60
+    if TOT_WAIT == TIME_LIM:
+        print &quot;Waited &quot; + str(TOT_WAIT) + &quot; seconds for system to start, giving up!&quot;
+        sys.exit(1)
+        
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINISHED WAIT SCRIPT&quot; 
+print &quot;&quot;
+print &quot;&quot;</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import os
+import sys
+import time
+import requests
+import paramiko
+from userpass import userpass
+
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;RUNNING PUPPET!&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+
+HOSTID       = open(&quot;hostid&quot;,&quot;r&quot;).readline()
+HOSTNAME     = open(&quot;host&quot;,&quot;r&quot;).readline()
+ENV          = os.getenv(&apos;DST_ENV&apos;)
+USER         = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASS         = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+SSH_USER     = userpass().creds()[&apos;ssh&apos;][&apos;user&apos;]
+SSH_PASS     = userpass().creds()[&apos;ssh&apos;][&apos;passwd&apos;]
+SERVER       = userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+TIME_LIM     = 600
+TIME_WAIT    = 60
+TOT_WAIT     = 60
+
+
+def get_status(hostid, server, user, password):
+    url      = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostid + &quot;/status&quot;
+    r        = requests.get(url,auth=(user, password),verify=False)
+    status   = r.json()[&apos;status&apos;]
+    if status != &quot;Active&quot;:
+       return False
+
+
+def exec_puppet(environment, target, time_wait, server, ssh_user, ssh_pass):
+    client      = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(target, username=ssh_user, password=ssh_pass)
+    stdin, stdout, stderr = client.exec_command(&quot;puppet agent -t --server=&quot; + server + &quot; --environment=&quot; + environment + &quot; --debug --onetime&quot;)
+    print &quot;Sleeping for &quot; + str(time_wait) + &quot; for puppet checkin&quot;
+    time.sleep(60)
+    exit_status =  stdout.channel.recv_exit_status()
+    print &quot;exit status: %s&quot; %(exit_status)
+    #if exit_status != 0:
+    #NEEDS FIXING PUPPET EXIT CODE
+    if exit_status == 0 or exit_status == 6:
+        print &quot;True&quot;
+        return True
+    else:
+        print &quot;False&quot;
+        return False
+
+         
+def check_running(hostid, server, user, password):
+    url      = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostid + &quot;/power&quot;
+    p        = {&quot;power_action&quot;:&quot;state&quot;}
+    h        = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+    r        = requests.put(url, auth=(user, password), params=p, headers=h, verify=False)
+    if r.json()[&apos;power&apos;] == &quot;running&quot;:
+       return True
+    else:
+       return False
+
+
+while True:
+    if not check_running(HOSTID, SERVER, USER, PASS):
+        print &quot;%s not running, exiting!&quot; %(HOSTNAME)
+        sys.exit(1)
+    if not get_status(HOSTID, SERVER, USER, PASS):
+        puppet_run = exec_puppet(ENV, HOSTNAME, TIME_WAIT, SERVER, SSH_USER, SSH_PASS)
+        if not puppet_run:
+            time.sleep(TIME_WAIT)
+        else:
+            print &quot;Puppet run successful, exiting!&quot;
+            break
+    else:
+        print &quot;Puppet run successful, exiting!&quot;
+        break
+    TOT_WAIT+=60
+    print &quot;Waiting an extra minute!&quot;
+    if TOT_WAIT == TIME_LIM:
+        print &quot;Waited &quot; + str(TOT_WAIT) + &quot; seconds for puppet to run without error, exiting!&quot;
+        break
+        
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINISHED RUNNING PUPPET!&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import os
+import sys
+import json
+import time
+import requests
+import paramiko
+from userpass import userpass
+
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;STARTING BATS TEST&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+
+HOSTID           = open(&quot;hostid&quot;,&quot;r&quot;).readline()
+ENV              = os.getenv(&apos;DST_ENV&apos;)
+USER             = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASS             = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+SSH_USER         = userpass().creds()[&apos;ssh&apos;][&apos;user&apos;]
+SSH_PASS         = userpass().creds()[&apos;ssh&apos;][&apos;passwd&apos;]
+SERVER           = userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+HOSTNAME         = open(&quot;host&quot;,&quot;r&quot;).readline()
+TIME_LIM         = 600
+TIME_WAIT        = 60
+RSA_KEY          = &quot;/var/lib/jenkins/.ssh/id_rsa&quot;
+GIT_SRV          = userpass().creds()[&apos;git&apos;][&apos;server&apos;]
+GIT_USER         = userpass().creds()[&apos;git&apos;][&apos;user&apos;]
+GIT_CMD          = &quot;git clone &quot; + GIT_USER + &quot;@&quot; + GIT_SRV + &quot;:/home/git/project/&quot;
+BATS_SRC_PATH    = &quot;project/bats/&quot;
+BATS_DST_PATH    = &quot;/tmp/bats/&quot;
+BATS_OUTPUT_FILE = &quot;outputs.bats&quot;
+
+
+def get_status(hostname, server, user, password):
+    url          = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostname + &quot;/status&quot;
+    r            = requests.get(url,auth=(user, password), verify=False)
+    status       = r.json()[&apos;status&apos;]
+    if status != &quot;Active&quot;:
+       return False
+
+
+def exec_cmd(cmd, dst, ssh_user, ssh_pass):
+    client       = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(dst,username=ssh_user, password=ssh_pass)
+    # SCP files over #modularize this
+    transport    = paramiko.Transport((dst,22))
+    transport.connect(username=ssh_user,password=ssh_pass)
+    sftp         = paramiko.SFTPClient.from_transport(transport)
+    sftp_open    = True
+    try:
+        sftp.mkdir(BATS_DST_PATH,mode=0755)
+    except IOError, e:
+        print &quot;folder exists, carrying on in support of repeated tests!&quot;
+    os.system(GIT_CMD)
+    filenames    = next(os.walk(BATS_SRC_PATH))[2]
+    for file in filenames:
+        print file
+        sftp.put(BATS_SRC_PATH + file, BATS_DST_PATH + file)
+    sftp.close()
+
+    stdin, stdout, stderr = client.exec_command(&quot;yum install bats -y;/usr/bin/bats --tap &quot; + BATS_DST_PATH + &quot;*.bats&quot;)
+    f = open(BATS_OUTPUT_FILE,&quot;w&quot;)
+    for i in stdout.readlines():
+       f.write(i)
+    f.close()
+    exit_status  =  stdout.channel.recv_exit_status()
+    print &quot;exit status: %s&quot; %(exit_status)
+    if exit_status != 0:
+        return False
+    else:
+        return True
+
+      
+def check_running(hostid, server, user, password):
+   url = &quot;https://&quot; + server + &quot;/api/v2/hosts/&quot; + hostid + &quot;/power&quot;
+   p   = {&quot;power_action&quot;:&quot;state&quot;}
+   h   = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+   r   = requests.put(url,auth=(user, password), params=p, headers=h, verify=False)
+   if r.json()[&apos;power&apos;] == &quot;running&quot;:
+       return True
+   else:
+       return False
+
+if not check_running(HOSTID, SERVER, USER, PASS):
+        print &quot;%s not running, exiting!&quot; %(HOSTNAME)
+if not get_status(HOSTNAME, SERVER, USER, PASS):
+        print &quot;Status is up&quot;
+        cmd_run = exec_cmd(&quot;holder&quot;, HOSTNAME, SSH_USER, SSH_PASS)
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;FINISHED BATS TEST&quot;
+print &quot;&quot;
+print &quot;&quot;
+</command>
+    </hudson.plugins.python.Python>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>import sys
+import requests
+from userpass import userpass
+
+
+print &quot;&quot;
+print &quot;&quot;
+print &quot;SHUTTING DOWN HOST&quot;
+print &quot;&quot;
+print &quot;&quot;
+
+
+HOSTID  = open(&quot;hostid&quot;,&quot;r&quot;).readline()
+USER    = userpass().creds()[&apos;foreman&apos;][&apos;user&apos;]
+PASS    = userpass().creds()[&apos;foreman&apos;][&apos;passwd&apos;]
+SERVER  =  userpass().creds()[&apos;foreman&apos;][&apos;server&apos;]
+url     = &quot;https://&quot; + SERVER +  &quot;/api/v2/hosts/&quot; + HOSTID + &quot;/power&quot;
+p       = {&quot;power_action&quot;:&quot;off&quot;}
+h       = {&quot;Content-Type&quot;: &quot;application/json&quot;}
+r       = requests.put(url,auth=(USER,PASS),params=p,headers=h, verify=False)
+if r.json()[&apos;power&apos;]:
+   print &quot;&quot;
+   print &quot;&quot;
+   print &quot;FINISHED SHUTDOWN SCRIPT&quot;
+   sys.exit(0)
+else:
+   print &quot;&quot;
+   print &quot;&quot;
+   print &quot;SHUTDOWN FAILED&quot;
+   sys.exit(1)</command>
+    </hudson.plugins.python.Python>
+  </builders>
+  <publishers>
+    <org.tap4j.plugin.TapPublisher plugin="tap@1.25">
+      <testResults>outputs.bats</testResults>
+      <failIfNoResults>false</failIfNoResults>
+      <failedTestsMarkBuildAsFailure>false</failedTestsMarkBuildAsFailure>
+      <outputTapToConsole>false</outputTapToConsole>
+      <enableSubtests>false</enableSubtests>
+      <discardOldReports>false</discardOldReports>
+      <todoIsFailure>false</todoIsFailure>
+      <includeCommentDiagnostics>false</includeCommentDiagnostics>
+      <validateNumberOfTests>false</validateNumberOfTests>
+      <planRequired>true</planRequired>
+      <verbose>true</verbose>
+      <showOnlyFailures>false</showOnlyFailures>
+    </org.tap4j.plugin.TapPublisher>
+    <hudson.tasks.BuildTrigger>
+      <childProjects>post-ci-promotion</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+        <completeBuild>true</completeBuild>
+      </threshold>
+    </hudson.tasks.BuildTrigger>
+    <hudson.tasks.Mailer plugin="mailer@1.17">
+      <recipients>graemedbc@gmail.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.30">
+      <deleteDirs>false</deleteDirs>
+      <cleanupParameter></cleanupParameter>
+      <externalDelete></externalDelete>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>

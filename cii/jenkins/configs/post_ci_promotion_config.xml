@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.python.Python plugin="python@1.3">
+      <command>#!/usr/bin/python
+# This script assumes you have a pulp feed configured and syncs repositories in a repo group
+# and waits for the sync to complete
+
+import os
+import sys
+import json
+import time
+import requests
+from userpass import userpass
+from requests.auth import HTTPBasicAuth
+requests.packages.urllib3.disable_warnings()
+
+print &quot;STARTING REPO PROMOTION SYNC!&quot;
+
+SRC_ENV    = os.getenv(&apos;SRC_ENV&apos;)
+
+# Work out destination to sync to based on recently updated repository
+
+if SRC_ENV  == &quot;7_dev&quot;:
+    DST_ENV =  &quot;7_uat&quot;
+if SRC_ENV  == &quot;7_uat&quot;:
+    DST_ENV =  &quot;7_prd&quot;
+# A more practical example could be promotion to staging repos where tests are carried out, then upon success the packages are promoted to uat, prd etc
+
+#if SRC_ENV  == &quot;7_dev_staging&quot;:
+#    DST_ENV =  &quot;7_dev&quot;
+#if SRC_ENV  == &quot;7_dev&quot;:
+#    DST_ENV =  &quot;7_uat_staging&quot;
+#if SRC_ENV  == &quot;7_uat_staging&quot;:
+#    DST_ENV =  &quot;7_uat&quot;
+#if SRC_ENV  == &quot;7_uat&quot;:
+#    DST_ENV =  &quot;7_prd_staging&quot;
+#if SRC_ENV  == &quot;7_prd_staging&quot;:
+#    DST_ENV =  &quot;7_prd&quot;
+
+print &quot;DST is: %s&quot; %DST_ENV
+
+
+USER       = userpass().creds()[&apos;pulp&apos;][&apos;user&apos;]
+PASS       = userpass().creds()[&apos;pulp&apos;][&apos;passwd&apos;]
+SERVER     = userpass().creds()[&apos;pulp&apos;][&apos;server&apos;]
+SYNC_ENV   = os.getenv(&apos;SYNC_ENV&apos;)
+URL        = &quot;https://&quot; + SERVER + &quot;/pulp/api/v2/repo_groups/&quot; + DST_ENV + &quot;/&quot;
+
+TASK_ARRAY = []
+SYNCED     = True
+SLEEP      = 5
+TIMEOUT    = 1200
+TOTALTIME  = 0
+
+if SYNC_ENV == &quot;no&quot;:
+   print &quot;SKIPPING REPO SYNC!&quot;
+   sys.exit(0)
+
+# Get list of repos to compare unit counts
+
+REPO_URL = &quot;https://&quot; + SERVER + &quot;/pulp/api/v2&quot;
+REPOS    = requests.get(REPO_URL + &quot;/repositories/&quot;,auth=HTTPBasicAuth(USER, PASS),verify=False).json()
+
+def checkRepoDiff(srcReps, dstReps, reps):
+    src_count = 0
+    dst_count = 0
+    for rep in reps:
+        if str(srcReps).strip() == str(rep[&apos;id&apos;]).strip():
+            src_count = rep[&apos;content_unit_counts&apos;][&apos;rpm&apos;]
+        if str(dstReps).strip() == str(rep[&apos;id&apos;]).strip():
+            dst_count = rep[&apos;content_unit_counts&apos;][&apos;rpm&apos;]
+    if src_count &lt; dst_count:
+        return True
+    else:
+        return False
+
+def checkTask(tId):
+    SRV= REPO_URL + &quot;/tasks/&quot; + tId + &quot;/&quot;
+    tIdCheck=requests.get(SRV,auth=HTTPBasicAuth(USER, PASS),verify=False)
+    state = json.loads(tIdCheck.text)
+    if state[&apos;state&apos;] == &quot;finished&quot;:
+       return True
+    else:
+       return False
+
+REPO_GROUPS = requests.get(URL,auth=HTTPBasicAuth(USER, PASS),verify=False).json()
+print &quot;repo groups: %s&quot; %REPO_GROUPS
+for repo in REPO_GROUPS[&apos;repo_ids&apos;]:
+    if checkRepoDiff(repo,repo.replace(DST_ENV, SRC_ENV), REPOS):
+        req  = {&quot;source_repo_id&quot;: repo.replace(DST_ENV, SRC_ENV), &apos;criteria&apos;:  {&quot;type_ids&quot;: [&apos;rpm&apos;]},&quot;override_config&quot;: {&quot;verify_checksum&quot;: False,&quot;verify_size&quot;: False}}
+        url  = REPO_URL + &quot;/repositories/&quot; + str(repo).strip() + &quot;/actions/associate/&quot;
+        sync = requests.post(url,auth=HTTPBasicAuth(USER, PASS),data=json.dumps(req),verify=False)
+    # might want to add a collective check against status code == 202
+    # AND a wait until sync is complete ie: a wait module? 
+        print sync.text
+        print sync.status_code
+        if str(sync.status_code).strip() == &quot;202&quot;:
+            TASK_ARRAY.append(json.loads(sync.text)[&apos;spawned_tasks&apos;][0][&apos;task_id&apos;])
+        else:
+            print &quot;sync failure code on repo: %s&quot; %repo
+            sys.exit(1)
+
+for task in TASK_ARRAY:
+    while SYNCED:
+       if not checkTask(task):
+          print &quot;Task %s sleeping for %s&quot; %(task, SLEEP)
+          TOTALTIME = TOTALTIME + SLEEP
+          time.sleep(SLEEP)
+       else:
+          print &quot;task %s completed&quot; %task
+          break
+       if TOTALTIME == TIMEOUT:
+          print &quot;Sync is taking too long, failing&quot;
+          sys.exit(-1)
+
+print &quot;FINISHING REPO PROMOTION SYNC!&quot;
+</command>
+    </hudson.plugins.python.Python>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>
