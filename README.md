@@ -55,10 +55,10 @@ This server hosts the CII systems and needs to be enabled for  Foreman to  acces
 
 We dont have too much to do here except open up a port for foreman to use and to do this we need to edit <b>/etc/libvirt/libvirtd.conf</b>
 ***
-listen_tls = 0
-listen_tcp = 1
-listen_addr = “0.0.0.0”
-auth_tcp = "none"
+|listen_tls = 0
+|listen_tcp = 1
+|listen_addr = “0.0.0.0”
+|auth_tcp = "none"
 ***
 
 And lastly change /etc/sysconfig/libvirtd and uncomment/add the following:
