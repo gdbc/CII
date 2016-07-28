@@ -161,7 +161,7 @@ What we’re doing here is setting up the first environment(7_dev) and from ther
 * Install Foreman:
 ```
 yum install foreman-installer git python-requests -y 
-foreman-installer  --enable-foreman-proxy --foreman-proxy-dns=true --enable-foreman-compute-libvirt --foreman-configure-epel-repo false --foreman-configure-scl-repo false (epel and scl are disabled here as they sync’d and added via [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh))
+foreman-installer  --enable-foreman-proxy --foreman-proxy-dns=true --enable-foreman-compute-libvirt --foreman-configure-epel-repo false --foreman-configure-scl-repo false (epel and scl are disabled here as they sync’d and added via create-cii-server-repos.sh)
 ```
 * Lets setup foreman, connect to foreman url as stated in output of install command, change the admin password to “admin”(if changed to something else be sure to change it in scripts used above) and lets get to work.
   * Infrastructure -> Compute Resources -> New Compute Resource
