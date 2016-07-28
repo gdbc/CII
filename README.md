@@ -62,7 +62,7 @@ auth_tcp = "none"
 ```
 
 And lastly change /etc/sysconfig/libvirtd and uncomment/add the following:
-
-*  LIBVIRTD_ARGS=”--listen”
-
+```
+ LIBVIRTD_ARGS=”--listen”
+```
 Restart the server or libvirtd
