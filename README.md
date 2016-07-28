@@ -1,4 +1,4 @@
-# CII - A Poor Man's guide to Continuous Infrastructure Integration using Jenkins, Foreman and Pulp
+# A Poor Man's guide to Continuous Infrastructure Integration using Jenkins, Foreman and Pulp
 ===================================================================================================
 
 * Author: Graeme Brooks-Crawford
@@ -31,3 +31,15 @@ Even if you have a staggered release cycle, it still pays to use CII to do the w
 We’re going to work with 3 environments 7_dev, 7_uat and 7_prd. These three environments coincide with Pulp repo groups with the same name, Foreman Puppet environments with the same name, similarly named Foreman Host Groups(hg-7_dev...) and Foreman Operating Systems (cent-7_dev...). The OS used in this guide is CentOS 7, though any RPM based distro should work.
 
 Follow this guide to the end and a much clearer picture of what we’re doing will be revealed.
+
+# System Requirements
+
+1 x Libvirtd host
+1 x Foreman server KVM VM
+1 x YUM repo server KVM VM
+1 x Pulp server KVM VM
+1 x Jenkins server KVM VM
+
+Note: All systems used here are on a libvirtd host, upon which they are guests. This libvirtd servers’ name is core.ci.com and will be used as a compute resource provider.
+
+I’ve added each server to the hosts file as well as the libvirtd as some systems will need to connect to this host to orchestrate VM’s.
