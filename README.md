@@ -241,5 +241,5 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
      * NB: Because this is on a host that runs libvirt and serves dhcp we need to edit that config to point pxe boots to this foreman server
      * On the libvirtd host server run:
      * virsh net-edit default
-     * Add: “<bootp file='/pxelinux.0' server='<ip of foreman server>'/>” between the <dhcp> tag
+     * Add: `“<bootp file='/pxelinux.0' server='<ip of foreman server>'/>”` between the `<dhcp>` tag
        
