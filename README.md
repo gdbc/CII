@@ -1,9 +1,9 @@
 # CII - A Poor Man's guide to Continuous Infrastructure Integration using Jenkins, Foreman and Pulp
 ===================================================================================================
 
-Author: Graeme Brooks-Crawford
-Email: graemedbc@gmail.com
-Date: 23/07/2016
+* Author: Graeme Brooks-Crawford
+* Email: graemedbc@gmail.com
+* Date: 23/07/2016
 
 This is a poor man's guide to Automated Continuous Infrastructure Integration or CII on RPM based Linux distributions that use Puppet and GIT. 
 
