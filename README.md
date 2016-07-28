@@ -327,7 +327,7 @@ The Jenkins server is the orchestrator of all of our jobs and the backbone to th
 
 <b><u>To Do:</u></b> 
 * Install Jenkins and support packages
-* ```
+```
 yum install java jenkins python-requests python-paramiko git -y
 systemctl enable jenkins
 systemctl start jenkins
