@@ -242,7 +242,6 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
      * On the libvirtd host server run:
      * virsh net-edit default
      * Add: `“<bootp file='/pxelinux.0' server='<ip of foreman server>'/>”` between the `<dhcp>` tag
-       
 * Configure Operating systems
      * Hosts -> Operating systems -> New Operating system
      * Name: cent-7_dev 
@@ -252,8 +251,7 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
      * Partition table: Kickstart default
      * Installation media: `<select all *-7_dev repositories>`
      * Submit
-
-* `“Associate template with Operating System”`
+* Associate template with Operating System
      * Hosts -> Provisioning Templates
      * Find ks-7 -> Association, select `“cent-7_dev 7”` 
      * Submit
@@ -262,4 +260,21 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
 * Back to cent-7_dev 7,  HOST -> OS -> cent-7_dev 7 -> Templates
      * provision: ks-7
      * PXELinux: Kickstart default PXELinux
+     * Submit
+* Configure Dev Host Groups
+     * Configure -> Host Groups -> New Host Group
+     * Name: hg-7_dev
+     * Environment: 7_dev
+     * Compute profile: profile-7
+     * Puppet CA: ci-foreman.ci.com
+     * Puppet Master: ci-foreman.ci.com	
+     * Puppet Classes: Select your classes
+     * Network:
+       * Domain: ci.com
+       * Subnet: base-network
+     * Architecture: x86_64
+     * Operating System: cent-7_dev 7
+     * Media: base-7_dev
+     * Partition Table: Kickstart default
+     * Root password: <enter password>
      * Submit
