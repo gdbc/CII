@@ -378,6 +378,41 @@ ssh-dss AAAAB3N….(ssh pub key)
 EOF
 ```
 * This should ensure we can connect to clients during the build process to run puppet, install packages, and run BAT tests.
-
+* Configure rudimentary git server for puppet code and bat test code <skip this test if you already have one, but be mindful of the git repo path structure as its used in the CI process>:
+  * On the GIT server:
+    ```
+    yum install git -y 
+    useradd git
+    su - git
+    mkdir -p .ssh/
+    chmod 700 .ssh/
+    touch .ssh/authorized_keys
+    chmod 600 .ssh/authorized_keys
+    cat id_dsa.pub(from jenkins user on jenkins server) >> .ssh/authorized_keys #ssh connections from jenkins user on jenkins server should be passwordless
+    ```
+  * NB: You must cp the public key from root on the foreman server created earlier and append it to the .ssh/authorized_keys as well. This is for pulling down new puppet code to foreman from the git server. 
+  * Test the login from root on the foreman server and “jenkins” on the jenkins server to the git user on the git server and type “yes” to accept the key.
+  * As the git user on the git server setup the environment:
+    ```
+    cd;mkdir project
+    cd project
+    git init --bare
+    git config --global user.email "you@yourdomain.com"
+    git config --global user.name "git"
+    mkdir -p {bats,puppet/environments/{7_dev,7_uat,7_prd}}
+    ```
+  * The following is ultimately the tree of what the git repo should look like once you’ve added modules, this should be the same or the code in jenkins needs to be changed to suite:
+    ├── bats
+    └── puppet
+      └── environments
+        ├── 7_dev
+        │   ├── manifests
+        │   └── modules
+        ├── 7_prd
+        │   ├── manifests
+        │   └── modules
+        └── 7_uat
+            ├── manifests
+            └── modules
 
 
