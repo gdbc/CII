@@ -1,4 +1,4 @@
-# A Poor Man's Guide to Continuous Infrastructure Integration using Jenkins, Foreman and Pulp
+# A Poor Man's Guide to Continuous Infrastructure Integration(CII) using Jenkins, Foreman and Pulp
 ===================================================================================================
 
 * Author: Graeme Brooks-Crawford
