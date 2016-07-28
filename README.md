@@ -151,7 +151,7 @@ What we’re doing here is setting up the first environment(7_dev) and from ther
 
 <b><u>Scripts:</u></b>
 * Configure yum repos: [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh)
-* Kickstart-template: ks-7
+* Kickstart-template: [ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7)
 * Clone Env: clone-os-hg.py
 
 
@@ -190,7 +190,7 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
    foreman-server:<foreman server>
 * Add the kickstart template
    * Hosts -> Provisioning Templates -> New Template -> Name: ks-7
-   * ""ks-7"" FILE
+   * Add [ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7) FILE
     * Note this a custom kickstart for descriptive purposes. You will probably need to configure your own.
     * CII Repos are kept out of my Puppet code so it doesn’t contaminate the CII project runs.
     * Type: Provision
@@ -212,7 +212,7 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
 | centos-sclo-rh-7_dev      | `http://cii-pulp.ci.com/pulp/repos/centos-sclo-rh-7_dev/`       | Red Hat   |
 | centos-sclo-sclo-7_dev    | `http://cii-pulp.ci.com/pulp/repos/centos-sclo-sclo-7_dev/`     | Red Hat   |
 
-* Add the required repositories(if necessary) to the ks-7 kickstart profile to use to install from(see current kickstart as a guide)
+* Add the required repositories(if necessary) to the [ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7) kickstart profile to use to install from(see current kickstart as a guide)
 ```
 # Add Repos
 repo --name=base             --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/base-<%=@host.environment %> --install 
@@ -364,13 +364,13 @@ cp /tmp/post_ci_repo_sync.xml /var/lib/jenkins/jobs/post-ci-promotion/config.xml
 chown jenkins.jenkins -R /var/lib/jenkins/jobs/
 systemctl restart jenkins
 ```
-* Create an ssh key for the jenkins user and add it to the foreman kickstart templates(ks-7) for so we can use remote commands later in the CI process to run remove commands, puppet etc
+* Create an ssh key for the jenkins user and add it to the foreman kickstart templates([ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7)) for so we can use remote commands later in the CI process to run remove commands, puppet etc
 ```
 usermod jenkins -s /bin/bash
 su - jenkins
 ssh-keygen -t dsa (hit enter on everything asked)
 ```
-* Capture contents of /var/lib/jenkins/.ssh/id_dsa.pub and insert it into the ks-7 kickstart template in the %post section:
+* Capture contents of /var/lib/jenkins/.ssh/id_dsa.pub and insert it into the [ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7) kickstart template in the %post section:
 ```
 mkdir -p /root/.ssh/
 cat << EOF >> /root/.ssh/authorized_keys
