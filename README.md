@@ -286,11 +286,12 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
 * <b>NB:</b> You should go back and use clone-create-repo-group.sh to create the Pulp repo group if the environment is newer than the ones created. See Pulp Server section. <- this should be done first
 * Now that we're finished the 7_dev or dev environment we can clone this to the 7_uat and 7_prd. Change the SERVER, USER and PASS variables in clone-os-hg.py
 	Make sure the part of the name matches the environment:
-            Create the uat env from dev:
+            
+	* Create the uat env from dev:
 	```	
-./clone-os-hg.py hg-7_dev hg-7_uat
+	./clone-os-hg.py hg-7_dev hg-7_uat
 	```
 	* Create the prd env from dev:
 	```
-./clone-os-hg.py hg-7_dev hg-7_prd
-```
+	./clone-os-hg.py hg-7_dev hg-7_prd
+	```
