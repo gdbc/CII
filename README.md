@@ -167,11 +167,25 @@ foreman-installer  --enable-foreman-proxy --foreman-proxy-dns=true --enable-fore
    * Create and cp your root public ssh key to the libvirtd server from ci-foreman for the root user
    * "Test Connection" and close
     * If the connection fails you may have to add some iptables rules etc
-* Next, setup the first environment, “dev”, after that we’ll clone it to uat and prd with clone-os-hg.py that will fill in the blanks in templates etc.
+* Next, setup the first environment, “7_dev”, after that we’ll clone it to uat and prd with clone-os-hg.py that will fill in the blanks in templates etc.
   * First scp your puppet modules and environments over to the Foreman server, make the path: /etc/puppet/environments/7_dev, verify ownership is puppet.root
    * NB: You will need to add your modules to /etc/puppet/modules to facilitate importing into respective environments
    ``` 
 cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
    ```
+* Configure Compute Profile:
+   * Infrastructure -> Compute Profiles -> New Compute Profile
+   * Name: “profile-7” CPUs: 4 Memory: 2GB  Network type: Virtual (NAT)-> Submit
+* Import 7_dev environment
+   * Configure -> Classes -> Import from <foreman server>
+   * Select 7_dev -> Update
+* Setup autosign for puppet client certs
+   * Add “*.domain.name” to /etc/puppet/autosign.conf
+   * Make sure permissions are foreman-proxy.puppet on this file
+* Create two global parameters that we will override in our templates 
+   * Configure -> Global parameters
+   pulp-server: <pulp server>
+   foreman-server:<foreman server>
+* Add the kickstart template:
 
 
