@@ -119,8 +119,8 @@ Installing the Pulp server is out of scope as there's sufficient documentation o
 
 <b><u>To Do:</u></b> 
 
-* Configure mount point /var/lib/pulp and /var/lib/mongodb
 * Edit the server entry in [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh) and run it to setup the yum repos we will use as our upstream source.
+* Configure mount point /var/lib/pulp and /var/lib/mongodb
 * Change REPO_SERVER and MASTER_GROUP_ID in create-sync-master-repos.sh and execute. This will create the master pulp repo group and repos that syncs directly from the repo server. This repo will be used to determine diffs against the eng environment, then eng against dev and so on to determine a difference and kickoff a jenkins jobs.
 * Change USER/PASS SERVER_URL in clone-create-repo-group.sh and create your other environments.
   * Syntax: ./clone-create-repo-group.sh SRC_GRP DST_GRP FEED_GRP
@@ -157,7 +157,7 @@ What we’re doing here is setting up the first environment(7_dev) and from ther
 
 <b><u>To Do:</u></b>
 
-* Edit the server entry in [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh) and run it to setup the yum repos to get our install and upstream packages
+* Edit the server entry in [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh) and run it to setup the yum repos to get our install and upstream packages.
 * Install Foreman:
 ```
 yum install foreman-installer git python-requests -y 
