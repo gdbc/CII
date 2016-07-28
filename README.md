@@ -152,7 +152,7 @@ What we’re doing here is setting up the first environment(7_dev) and from ther
 <b><u>Scripts:</u></b>
 * Configure yum repos: [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh)
 * Kickstart-template: [ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7)
-* Clone Env: clone-os-hg.py
+* Clone Env: [clone-os-hg.py](https://github.com/gdbc/CII/blob/master/cii/foreman/clone-os-hg.py)
 
 
 <b><u>To Do:</u></b>
@@ -169,7 +169,7 @@ foreman-installer  --enable-foreman-proxy --foreman-proxy-dns=true --enable-fore
    * Create and cp your root public ssh key to the libvirtd server from ci-foreman for the root user
    * "Test Connection" and close
     * If the connection fails you may have to add some iptables rules etc
-* Next, setup the first environment, “7_dev”, after that we’ll clone it to uat and prd with clone-os-hg.py that will fill in the blanks in templates etc.
+* Next, setup the first environment, “7_dev”, after that we’ll clone it to uat and prd with [clone-os-hg.py](https://github.com/gdbc/CII/blob/master/cii/foreman/clone-os-hg.py) that will fill in the blanks in templates etc.
   * First scp your puppet modules and environments over to the Foreman server, make the path: /etc/puppet/environments/7_dev, verify ownership is puppet.root
    * NB: You will need to add your modules to /etc/puppet/modules to facilitate importing into respective environments
    ``` 
@@ -286,7 +286,7 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
 * For the purposes of this how to we’re creating a “dev”, “uat” and “prd” environment, so lets create the two extra environments.
    * `mkdir -p /etc/puppet/environments/{7_uat,7_prd}/{modules,manifests}`
 * <b>NB:</b> You should go back and use clone-create-repo-group.sh to create the Pulp repo group if the environment is newer than the ones created. See Pulp Server section. <- this should be done first
-* Now that we're finished the 7_dev or dev environment we can clone this to the 7_uat and 7_prd. Change the SERVER, USER and PASS variables in clone-os-hg.py
+* Now that we're finished the 7_dev or dev environment we can clone this to the 7_uat and 7_prd. Change the SERVER, USER and PASS variables in [clone-os-hg.py](https://github.com/gdbc/CII/blob/master/cii/foreman/clone-os-hg.py)
 	Make sure the part of the name matches the environment:
             
 	* Create the uat env from dev:
