@@ -210,5 +210,19 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
 | centos-sclo-rh-7_dev      | `http://cii-pulp.ci.com/pulp/repos/centos-sclo-rh-7_dev/`       | Red Hat   |
 | centos-sclo-sclo-7_dev    | `http://cii-pulp.ci.com/pulp/repos/centos-sclo-sclo-7_dev/`     | Red Hat   |
 
+* Add the required repositories(if necessary) to the ks-7 kickstart profile to use to install from(see current kickstart as a guide)
+   # Add Repos
+repo --name=base --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/base-<%=@host.environment %> --install 
+repo --name=extras --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/extras-<%=@host.environment %> --install
+repo --name=updates --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/updates-<%=@host.environment %> --install
+repo --name=epel --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/epel-<%=@host.environment %> --install 
+repo --name=pulp --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/pulp-2-stable-<%=@host.environment %> --install 
+repo --name=puppet-deps --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/puppetlabs-deps-<%=@host.environment %> --install 
+repo --name=puppet-products --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/puppetlabs-products-<%=@host.environment %> --install 
+repo --name=centos-sclo-sclo --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/centos-sclo-sclo-<%=@host.environment %> --install 
+repo --name=centos-sclo-rh --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/centos-sclo-rh-<%=@host.environment %> -install
+repo --name=foreman --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/foreman-<%=@host.environment %> --install
+repo --name=foreman-plugins --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/foreman-plugins<%=@host.environment %> --install
+repo --name=jenkins --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/jenkins<%=@host.environment %> --install
 
 
