@@ -5,6 +5,8 @@
 * Email: graemedbc@gmail.com
 * Date: 23/07/2016
 
+
+## Intro
 This is a poor man's guide to Automated Continuous Infrastructure Integration or CII on RPM based Linux distributions that use Puppet and GIT. 
 
 Use this guide if you want to sync and test newly synced packages in an environment automatically, as well as test new or edited puppet code and post install TAP compliant scripts to test, verify and graph build environment integrity after packages have been installed and puppet has been run.
