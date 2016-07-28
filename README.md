@@ -279,5 +279,5 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
      * Root password: <enter password>
      * Submit
 * Clone this environment to create the remaining environments if required...
-<b<<u>NB:</u></b> When creating new environments you must create the puppet directory structure first before running the script eg: if you want a “tst” environment, on the foreman server run:
-`mkdir -p /etc/puppet/environments/7_tst/{modules, manifests}`
+   * <b<<u>NB:</u></b> When creating new environments you must create the puppet directory structure first before running the script eg: if you want a “tst” environment, on the foreman server run:
+     * `mkdir -p /etc/puppet/environments/7_tst/{modules, manifests}`
