@@ -243,3 +243,23 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
      * virsh net-edit default
      * Add: `“<bootp file='/pxelinux.0' server='<ip of foreman server>'/>”` between the `<dhcp>` tag
        
+* Configure Operating systems
+            Hosts -> Operating systems -> New Operating system
+            Name: cent-7_dev 
+            Major version: 7 
+            OS Family: Red Hat
+            Arch: x86_64
+            Partition table: Kickstart default
+            Installation media: `<select all *-7_dev repositories>`
+            Submit
+
+            `“Associate template with Operating System”`
+            Hosts -> Provisioning Templates
+            Find ks-7 -> Association, select `“cent-7_dev 7”` 
+            Submit
+            Find “Kickstart default PXELinux” -> Association, select `“cent-7_dev 7”`
+            Submit
+            Back to cent-7_dev 7,  HOST -> OS -> cent-7_dev 7 -> Templates
+            provision: ks-7
+            PXELinux: Kickstart default PXELinux
+            Submit
