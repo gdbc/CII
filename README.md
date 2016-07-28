@@ -95,6 +95,7 @@ Here we setup a cron job (<<cron-yum-repo-sync.sh>>) to continually sync from ou
 * Add cron-yum-repo-sync.sh to run in a cron which periodically syncs the configured repositories. I’ve set this up to run hourly by cp’ing it into /etc/cron.hourly. There will be a Pulp script that pulls these repo’s into a “master” repo and diffs it against ongoing environments which initialize Jenkins jobs to test the new packages.
 * Copy the.treeinfo, .discinfo files and the images and LiveOS folders from the “base” upstream repository to /var/www/html/pub/centos7/base/ This will ensure that you get the yum groups needed for installation and the pxe files needed to install systems that require yum groups.
 ========================
+
 ## Pulp Repository Server
 
 The Pulp server syncs and formalizes the repositories from the yum repo server. It has an API and some smart ways of de-dupping packages in repositories saving space and making the repositories easy to manage. We’ll be leveraging this api to check for and sync packages between environments. 
@@ -108,10 +109,10 @@ Installing the Pulp server is out of scope as there's sufficient documentation o
 * Memory: 8GB
 
 <b><u>Scripts:</u></b>
-Install Pulp Server: install-pulp.sh
-Configure yum repos: create-cii-server-repos.sh
-Create, sync master repo: create-sync-master-repos.sh
-Sync master repo group: sync-master-repo-group.py
-Pulp environment diff check: pulp-env-diff-check.py
+* Install Pulp Server: install-pulp.sh
+* Configure yum repos: create-cii-server-repos.sh
+* Create, sync master repo: create-sync-master-repos.sh
+* Sync master repo group: sync-master-repo-group.py
+* Pulp environment diff check: pulp-env-diff-check.py
 
 <b><u>To Do:</u></b> 
