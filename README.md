@@ -109,7 +109,7 @@ Installing the Pulp server is out of scope as there's sufficient documentation o
 * Memory: 8GB
 
 <b><u>Scripts:</u></b>
-* Configure yum repos: create-cii-server-repos.sh
+* Configure yum repos: [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh)
 * Install Pulp Server: install-pulp.sh
 * Create, sync master repo: create-sync-master-repos.sh
 * Sync master repo group: sync-master-repo-group.py
