@@ -135,3 +135,30 @@ Installing the Pulp server is out of scope as there's sufficient documentation o
  
 <b><u>NB:</u></b> Many of the scripts following rely on the environment matching this MASTER_GROUP_ID in particular the pulp repo names: puppetlabs-deps-7_master. They end in 7_master, split on an “-” which demarcates the environment. We’re going to use this elsewhere in Jenkins and Foreman.
 
+===========
+## Foreman Server
+
+The Foreman will be used by Jenkins to provision systems including setting up host groups, operating systems, puppet environments, compute profiles and kickstarts. 
+
+What we’re doing here is setting up the first environment(7_dev) and from there we can us a script to clone that environment to others.
+
+<b><u>SPECS:</u></b>
+* Name: cii-foreman.ci.com
+* Storage: n/a
+* Memory: 4GB
+
+<b><u>Scripts:</u></b>
+* Configure yum repos: create-cii-server-repos.sh
+* Kickstart-template: <ks-7>
+* Clone Env: clone-os-hg.py
+
+
+<b><u>To Do:</u></b>
+
+* Edit the server entry in create-cii-server-repos.sh and run it to setup the yum repos to get our install and upstream packages
+* Install foreman:
+```
+yum install foreman-installer git python-requests -y 
+foreman-installer  --enable-foreman-proxy --foreman-proxy-dns=true --enable-foreman-compute-libvirt --foreman-configure-epel-repo false --foreman-configure-scl-repo false (epel and scl are disabled here as they sync’d and added via create-cii-server-repos.sh)
+```
+
