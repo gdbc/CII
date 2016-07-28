@@ -194,6 +194,20 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
     * Type: Provision
 * Add the 7_dev repositories:
    * Hosts -> Installation Media -> New medium
+|Name	        |                 Path	         |      OS Family |    
+|-------------|-------------------------------|----------------|
+base-7_dev	   |                      http://ci-pulp.ci.com/pulp/repos/base-7_dev/ 	Red Hat |
+|epel-7_dev	    |                     http://ci-pulp.ci.com/pulp/repos/epel-7_dev/	            Red Hat |
+|extras-7_dev	   |                      http://ci-pulp.ci.com/pulp/repos/extras-7_dev/	Red Hat	|
+|foreman-7_dev    |                 http://ci-pulp.ci.com/pulp/repos/foreman-7_dev/	Red Hat	|
+|foreman-plugins-7_dev|	 http://ci-pulp.ci.com/pulp/repos/foreman-plugins-7_dev/	Red Hat		|
+|jenkins-7_dev	       |     http://ci-pulp.ci.com/pulp/repos/jenkins-7_dev/	   Red Hat	|
+|pulp-2-stable-7_dev	 |            http://ci-pulp.ci.com/pulp/repos/pulp-2-stable-7_dev/  Red Hat |
+|puppetlabs-deps-7_dev|        http://ci-pulp.ci.com/pulp/repos/puppetlabs-deps-7_dev/	Red Hat		|
+|puppetlabs-products-7_dev| http://ci-pulp.ci.com/pulp/repos/puppetlabs-products-7_dev/	Red Hat	|
+|updates-7_dev |                    http://ci-pulp.ci.com/pulp/repos/updates-7_dev/	   Red Hat   |
+|centos-sclo-rh-7_dev |          http://ci-pulp.ci.com/pulp/repos/centos-sclo-rh-7_dev/   Red Hat |
+|centos-sclo-sclo-7_dev |       http://ci-pulp.ci.com/pulp/repos/centos-sclo-sclo-7_dev/ Red Hat   |
 
 
 
