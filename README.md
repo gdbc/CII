@@ -322,7 +322,7 @@ The Jenkins server is the orchestrator of all of our jobs and the backbone to th
 
 <u><b>Scripts:</u></b>
 * Configure yum repos: [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh)
-* User pass library: userpass.py
+* User pass library: [userpass.py](https://github.com/gdbc/CII/blob/master/cii/jenkins/libs/userpass.py)
 * Jenkins Configs: cii-run-config.xml, post_cii_promotion_config.xml
 * GIT post-receive hook: post-receive
 
@@ -352,7 +352,7 @@ You may need to edit /etc/sysconfig/jenkins and set the following if you dont se
   * Disable “Prevent Cross Site Request Forgery exploits”
   * Select “Apply” then “Save”
   * I’ve had to, for some reason edit /var/lib/jenkins/config.xml and set useSecurity to false, restart jenkins and perform this `"Enable Security"` section again.
-* Copy userpass.py to /usr/lib64/python.2.7/
+* Copy [userpass.py](https://github.com/gdbc/CII/blob/master/cii/jenkins/libs/userpass.py) to /usr/lib64/python.2.7/
   * Edit the file and fill in the usernames and passwords for the pulp, foreman, git and root ssh user of the clients that will be used for testing.
 * Create the two jobs for the actual CII testing run and the post CII package promotion:
 ```
