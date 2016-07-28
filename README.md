@@ -100,7 +100,7 @@ Here we setup a cron job [cron-yum-repo-sync.sh](https://github.com/gdbc/CII/blo
 
 The Pulp server syncs and formalizes the repositories from the yum repo server in Repo groups which are bound to environments. Pulp has an API and some smart ways of de-dupping packages in repositories saving space making traditional Yum repositories easier to manage. We’ll be leveraging this API to check for and sync packages between environments. 
 
-Installing the Pulp server is out of scope as there's sufficient documentation on the project's site. FYI: I’ve included a very basic install script<<install-pulp.sh> which you may want to use if you fancy, however your distance may vary.
+Installing the Pulp server is out of scope as there's sufficient documentation on the project's site. FYI: I’ve included a very basic install script ([install-pulp.sh](https://github.com/gdbc/CII/blob/master/cii/pulp/useful_scripts/install-pulp.sh)) which you may want to use if you fancy, however your distance may vary.
 
 <b><u>SPECS:</u></b>
 * Name: cii-pulp.ci.com
@@ -110,7 +110,7 @@ Installing the Pulp server is out of scope as there's sufficient documentation o
 
 <b><u>Scripts:</u></b>
 * Configure yum repos: [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh)
-* Install Pulp Server: install-pulp.sh
+* Install Pulp Server: [install-pulp.sh](https://github.com/gdbc/CII/blob/master/cii/pulp/useful_scripts/install-pulp.sh)
 * Create, sync master repo: [create-sync-master-repos.sh](https://github.com/gdbc/CII/blob/master/cii/pulp/create-sync-master-repos.sh)
 * Sync master repo group: [sync-master-repo-group.py](https://github.com/gdbc/CII/blob/master/cii/pulp/sync-master-repo-group.py)
 * Pulp environment diff check: [pulp-env-diff-check.py](https://github.com/gdbc/CII/blob/master/cii/pulp/pulp-env-diff-check.py)
