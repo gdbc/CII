@@ -161,4 +161,11 @@ What we’re doing here is setting up the first environment(7_dev) and from ther
 yum install foreman-installer git python-requests -y 
 foreman-installer  --enable-foreman-proxy --foreman-proxy-dns=true --enable-foreman-compute-libvirt --foreman-configure-epel-repo false --foreman-configure-scl-repo false (epel and scl are disabled here as they sync’d and added via create-cii-server-repos.sh)
 ```
+* Lets setup foreman, connect to foreman url as stated in output of install command, change the admin password to “admin”(if changed to something else be sure to change it in scripts used above) and lets get to work.
+  * Infrastructure -> Compute Resources -> New Compute Resource
+  * Name: “libvirtd” Provider: “Libvirtd” URL: qemu+tcp://<libvirtd hostname>:16509/system (check which ip the port 16509 is running on on the libvirtd host)
+   * Create and cp your root public ssh key to the libvirtd server from ci-foreman for the root user
+   * Test Connection and close
+    * If the connection fails you may have to add some iptables rules etc
+
 
