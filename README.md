@@ -6,7 +6,7 @@
 * Date: 23/07/2016
 
 
-## Intro
+## Introduction
 
 This is a poor man's guide to building an Automated Continuous Infrastructure Integration or CII on RPM based Linux distributions that use Puppet and GIT. 
 
@@ -50,7 +50,7 @@ This server hosts the CII systems and needs to be enabled for  Foreman to  acces
 
 <b><u>SPECS:</u></b>
 * Name: core.ci.com
-* Storage: /var/lib/libvirt/images = 1TB
+* Storage: mount: /var/lib/libvirt/images size: 1TB
 * Memory: 32GB
 
 We dont have too much to do here except open up a port for foreman to use and to do this we need to edit <b>/etc/libvirt/libvirtd.conf</b>
@@ -78,3 +78,13 @@ This server is connected to external, upstream yum repository providers as well 
 Edit (<<yum-server-repo-srv-config.sh>>) to change, and create your repos. Again, if you have a yum repository server already ignore this script.
 ```
 Here we setup a cron job (<<cron-yum-repo-sync.sh>>) to continually sync from our upstream repositories. We will create a sync between Pulp and the repository server so we can determine diffs in repositories within each Pulp repo groups repositories. This will be one of our build triggers and configured later.
+
+<b><u>SPECS:</u></b>
+* Name: cii-repo.ci.com
+* Storage: mount: /var/www/html size: 100GB
+* Memory: 4GB
+
+<b><u>Scripts</u></b>
+<add script paths to github repo>
+Configuration Script: yum-server-repo-srv-config.sh
+Cron Script: cron-yum-repo-sync.sh
