@@ -421,6 +421,8 @@ EOF
 * This hook will kick off jenkins jobs for each environment 7_dev,7_uat or 7_prd environments when a “git post” is run. It will do the same for bat test updates for 7_dev, though each jenkins run will pull a fresh copy of bats and run it. The bats tests are not segmented between environments like the puppet environments.
 * The variable `“JENKINS_SERVER"` and possibly `"JENKINS_PROJECT"` and `"JENKINS_PROJECT_TOKEN"` will need to be edited to coincide with the parameters set in the jenkins job
 
+=====
+
 That's it, you're done and ready to initialize jobs via adding/editing BAT tests to the git repo or by adding modules to puppets git repo. This will trigger the post-commit script which in turn will trigger the cii-run job on the jenkins server.
 
 The cron job on the repo server(cron-yum-repo-sync.sh) will sync from upstream yum repos. 
