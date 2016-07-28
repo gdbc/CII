@@ -44,7 +44,6 @@ Follow this guide to the end and a much clearer picture of what we’re doing wi
 
 **Note:** All systems used here are on a libvirtd host, upon which they are guests. This libvirtd servers name is core.ci.com and will be used as a compute resource provider.
 
-===========
 ## Libvirt Host
 
 This server hosts the CII systems and needs to be enabled for  Foreman to  access and rebuild VM’s.
