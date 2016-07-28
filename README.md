@@ -38,7 +38,7 @@ Follow this guide to the end and a much clearer picture of what we’re doing wi
 
 * 1 x Libvirtd host
 * 1 x Foreman server KVM VM
-* 1 x YUM repo server KVM VM
+* 1 x Yum repo server KVM VM
 * 1 x Pulp server KVM VM
 * 1 x Jenkins server KVM VM
 
@@ -52,3 +52,17 @@ This server hosts the CII systems and needs to be enabled for  Foreman to  acces
 * Name: core.ci.com
 * Storage: /var/lib/libvirt/images = 1TB
 * Memory: 32GB
+
+We dont have too much to do here except open up a port for foreman to use and to do this we need to edit <b>/etc/libvirt/libvirtd.conf</b>
+***
+listen_tls = 0
+listen_tcp = 1
+listen_addr = “0.0.0.0”
+auth_tcp = "none"
+***
+
+And lastly change /etc/sysconfig/libvirtd and uncomment/add the following:
+
+*  LIBVIRTD_ARGS=”--listen”
+
+Restart the server or libvirtd
