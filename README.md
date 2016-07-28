@@ -359,11 +359,25 @@ mkdir -p /var/lib/jenkins/jobs/{cii-run,post-ci-promotion}
 cp /tmp/ci-run-config.xml /var/lib/jenkins/jobs/cii-run/config.xml
 cp /tmp/post_ci_repo_sync.xml /var/lib/jenkins/jobs/post-ci-promotion/config.xml
 ```
-* <b><u>Note:</u></b> The post-cii-promotion is just an “example” script that can promote a repo to another Eg: from a staging repo group and environment where the tests were carried out to an official dev repo group and dev environment, there may be change control restrictions here etc, though this is a good example of something to do after the tests have passed ie: send a notification. You may also not want to sync to live repos in case of failure.
+* <b><u>Note:</u></b> The post-cii-promotion is just an example script that can promote a repo to another Eg: from a staging repo group and environment where the tests were carried out to an official dev repo group and dev environment, there may be change control restrictions here etc, though this is a good example of something to do after the tests have passed ie: send a notification. You may also not want to sync to live repos in case of failure.
 ```
 chown jenkins.jenkins -R /var/lib/jenkins/jobs/
 systemctl restart jenkins
 ```
+* Create an ssh key for the jenkins user and add it to the foreman kickstart templates(ks-7) for so we can use remote commands later in the CI process to run remove commands, puppet etc
+```
+usermod jenkins -s /bin/bash
+su - jenkins
+ssh-keygen -t dsa (hit enter on everything asked)
+```
+* Capture contents of /var/lib/jenkins/.ssh/id_dsa.pub and insert it into the ks-7 kickstart template in the %post section:
+```
+mkdir -p /root/.ssh/
+cat << EOF >> /root/.ssh/authorized_keys
+ssh-dss AAAAB3N….(ssh pub key)
+EOF
+```
+* This should ensure we can connect to clients during the build process to run puppet, install packages, and run BAT tests.
 
 
 
