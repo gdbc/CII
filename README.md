@@ -24,17 +24,19 @@ These three points:
 * Automate testing of added/edited puppet configuration in GIT
 * Automate execution and graphing of Bash Automated Testing(BAT: https://github.com/sstephenson/bats) which is Test      Anything Protocol (TAP: https://testanything.org/producers.html) compliant, when tests are added or edited in GIT. These tests are run post build and used for verification of build integrity to justify functionality in a designated environment.
 
-These 3 points are represented diagramatically In the below flow diagram ![CII Flow Diagram](https://github.com/gdbc/CII/blob/master/cii/diagrams/CII-Flow.jpg?raw=true "CII Flow Diagram")
+These 3 points are represented diagramatically In the below flow diagram. ![CII Flow Diagram](https://github.com/gdbc/CII/blob/master/cii/diagrams/CII-Flow.jpg?raw=true "CII Flow Diagram")
 
 This enables infrastructure teams to release patches and configuration and automatically test the results of those changes and those patches and configuration will work in the target environments, be it DEV, UAT or PRD, reducing or negating manual effort to achieve and document the same results.
-
-A diagramatic representation of the flow of packages from upstream repositories through Pulp and controlled by Jenkins can be seen [here](https://github.com/gdbc/CII/blob/master/cii/diagrams/ci-package-promotion-overview.jpg).
 
 Even if you have a staggered release cycle, it still pays to use CII to do the work up until you release.
 
 ## Environment Configuration
 
 We’re going to work with 3 environments 7_dev, 7_uat and 7_prd. These three environments coincide with Pulp repo groups with the same name, Foreman Puppet environments with the same name, similarly named Foreman Host Groups(hg-7_dev...) and Foreman Operating Systems (cent-7_dev...). The OS used in this guide is CentOS 7, though any RPM based distro should work.
+
+A diagramatic representation of the above mentioned 3 environments showing how Jenkins will control the flow of packages from upstream repositories and sync through each environment. 
+
+![Pulp Flow Diagram](https://github.com/gdbc/CII/blob/master/cii/diagrams/ci-package-promotion-overview.jpg?raw=true "Pulp Flow Diagram")
 
 Follow this guide to the end and a much clearer picture of what we’re doing will be revealed.
 
