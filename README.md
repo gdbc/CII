@@ -209,5 +209,7 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
 | centos-sclo-rh-7_dev      | 'http://cii-pulp.ci.com/pulp/repos/centos-sclo-rh-7_dev/'      | Red Hat   |
 | centos-sclo-sclo-7_dev    | 'http://cii-pulp.ci.com/pulp/repos/centos-sclo-sclo-7_dev/'    | Red Hat   |
 
-
+| test | test |
+| ---- | ---- |
+| asdf | asdf |
 
