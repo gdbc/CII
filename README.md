@@ -1,4 +1,4 @@
-# A Poor Man's guide to Continuous Infrastructure Integration using Jenkins, Foreman and Pulp
+# A Poor Man's Guide to Continuous Infrastructure Integration using Jenkins, Foreman and Pulp
 ===================================================================================================
 
 * Author: Graeme Brooks-Crawford
@@ -12,7 +12,7 @@ This is a poor man's guide to building an Automated Continuous Infrastructure In
 
 Use this guide if you want to sync and test newly synced packages in an environment automatically, as well as test new or edited puppet code and post install TAP compliant scripts to test, verify and graph build environment integrity after packages have been installed and puppet has been run.
 
-This is called “The poor man’s guide” as we leverage most of the FOSS upstream tools bundled into Red Hat’s Satellite Server(Foreman, Pulp, Puppet) and combine them via API scripts and Jenkins to produce automated patch, configuration and testing of Operating System builds. So if you don't have Red Hat Satellite in your environment but need automated testing of code and packages on your builds, then this guide is for you.
+This is called the "poor man’s guide” as we leverage most of the FOSS upstream tools bundled into Red Hat’s Satellite Server(Foreman, Pulp, Puppet) and combine them via API scripts and Jenkins to produce automated patch, configuration and testing of Operating System builds. So if you don't have Red Hat Satellite in your environment but need automated testing of code and packages on your builds, then this guide is for you.
 
  For a good CII template based on Red Hat’s Satellite server, please look at Dr Nick Strugnell's excellent guide here: https://github.com/RedHatSatellite/soe-ci.
  
