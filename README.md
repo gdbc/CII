@@ -38,8 +38,6 @@ A diagramatic representation of the above mentioned 3 environments showing how J
 
 ![Pulp Flow Diagram](https://github.com/gdbc/CII/blob/master/cii/diagrams/ci-package-promotion-overview.jpg?raw=true "Pulp Flow Diagram")
 
-Follow this guide to the end and a much clearer picture of what we’re doing will be revealed.
-
 ## System Requirements
 
 * 1 x Libvirtd host
