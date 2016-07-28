@@ -40,6 +40,6 @@ Follow this guide to the end and a much clearer picture of what we’re doing wi
 * 1 x Pulp server KVM VM
 * 1 x Jenkins server KVM VM
 
-Note: All systems used here are on a libvirtd host, upon which they are guests. This libvirtd servers’ name is core.ci.com and will be used as a compute resource provider.
+<b>Note:</b> All systems used here are on a libvirtd host, upon which they are guests. This libvirtd servers’ name is core.ci.com and will be used as a compute resource provider.
 
 I’ve added each server to the hosts file as well as the libvirtd as some systems will need to connect to this host to orchestrate VM’s.
