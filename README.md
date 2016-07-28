@@ -323,7 +323,7 @@ The Jenkins server is the orchestrator of all of our jobs and the backbone to th
 <u><b>Scripts:</u></b>
 * Configure yum repos: [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh)
 * User pass library: [userpass.py](https://github.com/gdbc/CII/blob/master/cii/jenkins/libs/userpass.py)
-* Jenkins Configs: cii-run-config.xml, post_cii_promotion_config.xml
+* Jenkins Configs: [cii-run-config.xml](https://github.com/gdbc/CII/blob/master/cii/jenkins/configs/cii-run-config.xml), [post_cii_promotion_config.xml](https://github.com/gdbc/CII/blob/master/cii/jenkins/configs/post_cii_promotion_config.xml)
 * GIT post-receive hook: post-receive
 
 <b><u>To Do:</u></b> 
@@ -356,9 +356,9 @@ You may need to edit /etc/sysconfig/jenkins and set the following if you dont se
   * Edit the file and fill in the usernames and passwords for the pulp, foreman, git and root ssh user of the clients that will be used for testing.
 * Create the two jobs for the actual CII testing run and the post CII package promotion:
 ```
-mkdir -p /var/lib/jenkins/jobs/{cii-run,post-ci-promotion}
-cp /tmp/ci-run-config.xml /var/lib/jenkins/jobs/cii-run/config.xml
-cp /tmp/post_ci_repo_sync.xml /var/lib/jenkins/jobs/post-ci-promotion/config.xml
+mkdir -p /var/lib/jenkins/jobs/{cii-run,post-cii-promotion}
+cp /tmp/cii-run-config.xml /var/lib/jenkins/jobs/cii-run/config.xml
+cp /tmp/post_cii_repo_sync.xml /var/lib/jenkins/jobs/post-cii-promotion/config.xml
 ```
 * <b><u>Note:</u></b> The post-cii-promotion is just an example script that can promote a repo to another Eg: from a staging repo group and environment where the tests were carried out to an official dev repo group and dev environment, there may be change control restrictions here etc, though this is a good example of something to do after the tests have passed ie: send a notification. You may also not want to sync to live repos in case of failure.
 ```
