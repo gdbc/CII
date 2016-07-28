@@ -98,7 +98,7 @@ Here we setup a cron job (<<cron-yum-repo-sync.sh>>) to continually sync from ou
 ========================
 ## Pulp Repository Server
 
-The Pulp server syncs and formalizes the repositories from the yum repo server. It has an API and some smart ways of de-dupping packages in repositories saving space and making the repositories easy to manage. We’ll be leveraging this api to check for and sync packages between environments. 
+The Pulp server syncs and formalizes the repositories from the yum repo server in Repo groups which are bound to environments. Pulp has an API and some smart ways of de-dupping packages in repositories saving space making traditional Yum repositories easier to manage. We’ll be leveraging this API to check for and sync packages between environments. 
 
 Installing the Pulp server is out of scope as there's sufficient documentation on the project's site. FYI: I’ve included a very basic install script<<install-pulp.sh> which you may want to use if you fancy, however your distance may vary.
 
