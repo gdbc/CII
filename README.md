@@ -295,3 +295,6 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
 	```
 	./clone-os-hg.py hg-7_dev hg-7_prd
 	```
+* Build some test hosts bound to each host group so jenkins can find available hosts to use to reinstall and run the jobs on, this will also test that your host provisioning works. 
+Hosts need to be powered off for Jenkins to determine them as being available. 
+* Make sure you can resolve or get to these hosts from the foreman, jenkins and core servers.
