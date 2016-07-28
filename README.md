@@ -1,4 +1,9 @@
 # CII - A Poor Man's guide to Continuous Infrastructure Integration using Jenkins, Foreman and Pulp
+===================================================================================================
+
+Author: Graeme Brooks-Crawford
+Email: graemedbc@gmail.com
+Date: 23/07/2016
 
 This is a poor man's guide to Automated Continuous Infrastructure Integration or CII on RPM based Linux distributions that use Puppet and GIT. 
 
@@ -12,9 +17,9 @@ This is called “The poor man’s guide” as we leverage most of the FOSS upst
 
 These three points:
 
-Automate testing of new packages synced into environment repositories
-Automate testing of added/edited puppet configuration in GIT
-Automate execution and graphing of Bash Automated Testing(BAT: https://github.com/sstephenson/bats) which is Test Anything Protocol (TAP: https://testanything.org/producers.html) compliant, when tests are added or edited in GIT. These tests are run post build and used for verification of build integrity to justify functionality in a designated environment.
+* Automate testing of new packages synced into environment repositories
+* Automate testing of added/edited puppet configuration in GIT
+* Automate execution and graphing of Bash Automated Testing(BAT: https://github.com/sstephenson/bats) which is Test      Anything Protocol (TAP: https://testanything.org/producers.html) compliant, when tests are added or edited in GIT. These tests are run post build and used for verification of build integrity to justify functionality in a designated environment.
 
 This enables infrastructure teams to release patches and configuration and automatically test the results of those changes and those patches and configuration will work in the target environments, be it DEV, UAT or PRD, reducing or negating manual effort to achieve and document the same results.
 
