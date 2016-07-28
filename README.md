@@ -75,9 +75,9 @@ This server probably exists in your environment already as a provider of yum rep
 This server is connected to external, upstream yum repository providers as well as being able to host local company specific repos with custom rpms, it's the upstream source of where the Pulp server will source its content for our CII engine, serving primarily the 7_master Pulp repo group. 
 
 ```
-Edit (<<yum-server-repo-srv-config.sh>>) to change, and create your repos. Again, if you have a yum repository server already ignore this script.
+Edit [yum-server-repo-srv-config.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/yum-server-repo-srv-config.sh) to change, and create your repos. Again, if you have a yum repository server already ignore this script.
 ```
-Here we setup a cron job (<<cron-yum-repo-sync.sh>>) to continually sync from our upstream repositories. We will create a sync between Pulp and the repository server so we can determine diffs in repositories within each Pulp repo groups repositories. This will be one of our build triggers and configured later.
+Here we setup a cron job [cron-yum-repo-sync.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/cron-yum-repo-sync.sh) to continually sync from our upstream repositories. We will create a sync between Pulp and the repository server so we can determine diffs in repositories within each Pulp repo groups repositories. This will be one of our build triggers and configured later.
 
 <b><u>SPECS:</u></b>
 * Name: cii-repo.ci.com
@@ -85,14 +85,14 @@ Here we setup a cron job (<<cron-yum-repo-sync.sh>>) to continually sync from ou
 * Memory: 4GB
 
 <b><u>Scripts:</u></b>
-* Configuration Script: (<<yum-server-repo-srv-config.sh>>)
-* Cron Script: (<<cron-yum-repo-sync.sh>>)
+* Configuration Script: [yum-server-repo-srv-config.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/yum-server-repo-srv-config.sh)
+* Cron Script: [cron-yum-repo-sync.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/cron-yum-repo-sync.sh)
 
 <b><u>To Do:</u></b>
 
-* Edit yum-server-repo-srv-config.sh to include or exclude the yum repositories required
-* Run the yum-server-repo-srv-config.sh which will configure upstream yum repos to sync. 
-* Add cron-yum-repo-sync.sh to run in a cron which periodically syncs the configured repositories. I’ve set this up to run hourly by cp’ing it into /etc/cron.hourly. There will be a Pulp script that pulls these repo’s into a “master” repo and diffs it against ongoing environments which initialize Jenkins jobs to test the new packages.
+* Edit [yum-server-repo-srv-config.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/yum-server-repo-srv-config.sh) to include or exclude the yum repositories required
+* Run the [yum-server-repo-srv-config.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/yum-server-repo-srv-config.sh) which will configure upstream yum repos to sync. 
+* Add [cron-yum-repo-sync.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/cron-yum-repo-sync.sh) to run in a cron which periodically syncs the configured repositories. I’ve set this up to run hourly by cp’ing it into /etc/cron.hourly. There will be a Pulp script that pulls these repo’s into a “master” repo and diffs it against ongoing environments which initialize Jenkins jobs to test the new packages.
 * Copy the.treeinfo, .discinfo files and the images and LiveOS folders from the “base” upstream repository to /var/www/html/pub/centos7/base/ This will ensure that you get the yum groups needed for installation and the pxe files needed to install systems that require yum groups.
 
 ========================
@@ -425,7 +425,7 @@ EOF
 
 That's it, you're done and ready to initialize jobs via adding/editing BAT tests to the git repo or by adding modules to puppets git repo. This will trigger the post-commit script which in turn will trigger the cii-run job on the jenkins server.
 
-The cron job on the repo server(cron-yum-repo-sync.sh) will sync from upstream yum repos. 
+The cron job on the repo server[cron-yum-repo-sync.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/cron-yum-repo-sync.sh) will sync from upstream yum repos. 
 
 The cron jobs on the pulp server (pulp-env-diff-check-dev.py, pulp-env-diff-check-uat.py, pulp-env-diff-check-prd.py… or one for each environment) will sync from the repo server and diff against the pulp repositories where if it finds a diff for dev(between 7_master and 7_dev), diff to uat(between 7_dev and 7_uat) and lastly diff to prd(between 7_uat to 7_prd).
 
