@@ -196,9 +196,9 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
    * Hosts -> Installation Media -> New medium
 |Name	                      |Path	                                                           | OS Family |    
 | ------------------------- | -------------------------------------------------------------- | --------- |
-| base-7_dev	               | 'http://cii-pulp.ci.com/pulp/repos/base-7_dev/' 	              | Red Hat   |
-| epel-7_dev	               | 'http://cii-pulp.ci.com/pulp/repos/epel-7_dev/'	               | Red Hat   |
-| extras-7_dev	             | 'http://cii-pulp.ci.com/pulp/repos/extras-7_dev/'	             | Red Hat	  |
+| base-7_dev	               | (http://cii-pulp.ci.com/pulp/repos/base-7_dev/) 	              | Red Hat   |
+| epel-7_dev	               | (http://cii-pulp.ci.com/pulp/repos/epel-7_dev/)	               | Red Hat   |
+| extras-7_dev	             | (http://cii-pulp.ci.com/pulp/repos/extras-7_dev/)	             | Red Hat	  |
 | foreman-7_dev             | 'http://cii-pulp.ci.com/pulp/repos/foreman-7_dev/'	            | Red Hat	  |
 | foreman-plugins-7_dev     | 'http://cii-pulp.ci.com/pulp/repos/foreman-plugins-7_dev/'	    | Red Hat	  |
 | jenkins-7_dev	            | 'http://cii-pulp.ci.com/pulp/repos/jenkins-7_dev/'	            | Red Hat	  |
