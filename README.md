@@ -47,3 +47,8 @@ Follow this guide to the end and a much clearer picture of what we’re doing wi
 ## Libvirt Host
 
 This server hosts the CII systems and needs to be enabled for  Foreman to  access and rebuild VM’s.
+
+<b><u>SPECS:</u></b>
+* Name: core.ci.com
+* Storage: /var/lib/libvirt/images = 1TB
+* Memory: 32GB
