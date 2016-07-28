@@ -186,6 +186,12 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
    * Configure -> Global parameters
    pulp-server: <pulp server>
    foreman-server:<foreman server>
-* Add the kickstart template:
+* Add the kickstart template
+   * Hosts -> Provisioning Templates -> New Template -> Name: ks-7
+   * ""<<ks-7>>"" FILE
+    * Note this a custom kickstart for descriptive purposes. You will probably need to configure your own.
+    * CII Repos are kept out of my Puppet code so it doesn’t contaminate the CII project runs.
+Type: Provision
+
 
 
