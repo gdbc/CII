@@ -28,6 +28,6 @@ This enables infrastructure teams to release patches and configuration and autom
 Even if you have a staggered release cycle, it still pays to use CII to do the work up until you release.
 
 ## Environment Configuration
-We’re going to work with 3 environments 7_dev, 7_uat and 7_prd. These three environments coincide with Pulp repo groups with the same name, Foreman Puppet environments with the same name, similarly named Foreman Host Groups(eg: hg-7_dev...) and Foreman Operating Systems (cent-7_dev...). The OS used is CentOS 7, though any RPM based distro should work.
+We’re going to work with 3 environments 7_dev, 7_uat and 7_prd. These three environments coincide with Pulp repo groups with the same name, Foreman Puppet environments with the same name, similarly named Foreman Host Groups(hg-7_dev...) and Foreman Operating Systems (cent-7_dev...). The OS used is CentOS 7, though any RPM based distro should work.
 
 Follow this guide to the end and a much clearer picture of what we’re doing will be revealed.
