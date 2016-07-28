@@ -1,0 +1,107 @@
+#version=RHEL7
+# System authorization information
+auth --enableshadow --passalgo=sha512
+
+# Use CDROM installation media
+install
+url --url="http://<%= @host.params['pulp-server'] %>/pulp/repos/base-<%=@host.environment %>/"
+# Run the Setup Agent on first boot
+firstboot --disable
+ignoredisk --only-use=vda
+
+# Keyboard layouts
+keyboard --vckeymap=uk --xlayouts='gb'
+skipx
+text
+# System language
+lang en_GB.UTF-8
+reboot 
+
+# Network information
+network  --bootproto=dhcp --device=eth0 --onboot=off --ipv6=auto
+#network  --hostname=localhost.localdomain
+# Root password
+rootpw --iscrypted $6$9EF1Qnnn3ioGTblD$6EtO1pe28hUijkg7eZKjQmaJwyZLehOHLFhblar5V....
+# System timezone
+timezone Europe/London --isUtc
+
+# Switch services off
+
+firewall --disabled
+selinux  --disabled
+
+# System bootloader configuration
+bootloader --location=mbr --boot-drive=vda
+autopart --type=lvm
+# Partition clearing information
+clearpart --all
+# Add Repos
+repo --name=base --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/base-<%=@host.environment %> --install 
+repo --name=extras --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/extras-<%=@host.environment %> --install
+repo --name=updates --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/updates-<%=@host.environment %> --install
+repo --name=epel --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/epel-<%=@host.environment %> --install 
+repo --name=pulp --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/pulp-2-stable-<%=@host.environment %> --install 
+repo --name=puppet-deps --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/puppetlabs-deps-<%=@host.environment %> --install 
+repo --name=puppet-products --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/puppetlabs-products-<%=@host.environment %> --install 
+repo --name=centos-sclo-sclo --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/centos-sclo-sclo-<%=@host.environment %> --install 
+repo --name=centos-sclo-rh --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/centos-sclo-rh-<%=@host.environment %> --install
+repo --name=foreman --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/foreman-<%=@host.environment %> --install
+repo --name=foreman-plugins --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/foreman-plugins-<%=@host.environment %> --install
+repo --name=jenkins --baseurl=http://<%= @host.params['pulp-server'] %>/pulp/repos/jenkins<%=@host.environment %> --install
+
+
+%packages --nobase --ignoremissing
+
+bats
+chrony
+vim-enhanced
+screen
+wget
+puppet
+%end
+
+%post --log=/root/ks-post.log
+
+# Configure facts file for custom facts
+
+set -- `cat /proc/cmdline`
+for VARS in $*;
+do
+case "$VARS" in *=*)
+echo $VARS >> /etc/facts.txt
+esac
+done
+
+# Remove CentOS repos
+
+rm -rf /etc/yum.repos.d/CentOS*
+
+# Disable gpg checks on repos
+for i in `ls /etc/yum.repos.d/*`;do echo "gpgcheck=0" >> $i;done
+
+# Set up keys
+
+mkdir -p /root/.ssh/
+cat << EOF >> /root/.ssh/authorized_keys
+#Add ssy keys here
+EOF
+
+# Configure hostname
+
+echo <%= @host %> > /etc/hostname
+hostname <%= @host %> 
+
+
+echo  <%= @host.ip %> <%= @host %> <%= @host %> `hostname -s` >> /etc/hosts
+# Run puppet
+
+
+echo "*/10 * * * * root puppet agent -t --server=<%= @host.params['foreman-server'] %> --environment=<%=@host.environment %> --debug --onetime" >> /etc/cron.d/puppet_client_crond
+echo "before puppetrun"
+hostname
+puppet agent -t --server=<%= @host.params['foreman-server'] %> --environment=<%=@host.environment %> --debug --onetime
+
+# Tell foreman that we're done
+wget -q -O /dev/null --no-check-certificate <%= foreman_url %>
+
+%end

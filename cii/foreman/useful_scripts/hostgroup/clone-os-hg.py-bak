@@ -1,0 +1,117 @@
+#!/usr/bin/python
+#Usage: /clone-os-hg.py <source HG to clone; format hg-7_dev> <HG name>
+
+import sys
+import json
+import requests
+from requests.auth import HTTPBasicAuth
+
+SERVER="cii-foreman.ci.com"
+USER="admin"
+PASS="admin"
+SOURCE_HG=sys.argv[1]
+NAME=sys.argv[2]
+HEADERS = {'content-type': 'application/json'}
+
+
+OS_URL          = "https://" + SERVER + "/api/v2/operatingsystems"
+OS              = NAME.replace("hg","cent")
+OS_NAME         = OS
+OS_MAJOR        = int(OS.split('_')[0].split('-')[1])
+OS_FAMILY       = "Redhat"
+ENV             = OS.split('-')[1]
+NEW_ENV         = "7_" + NAME.split("_")[1]
+SOURCE_OS       = SOURCE_HG.replace("hg","cent")
+
+
+def get_media_id(SERVER, env):
+    media_name = "base-" + env
+    URL="https://" + SERVER + "/api/v2/media"
+    get_media=requests.get(URL,auth=HTTPBasicAuth(USER, PASS),verify=False).json()
+    for i in get_media['results']:
+        if media_name in i['name']:
+           return i['id']
+
+def get_details_from_source(SERVER):
+   URL="http://" + SERVER + "/api/v2/operatingsystems"
+   get_os=requests.get(URL,auth=HTTPBasicAuth(USER, PASS),verify=False).json()
+   prov_ids      = []
+   if SOURCE_OS  == get_os['results'][0]['name']:
+       OS_ID     = get_os['results'][0]['id']
+       URL       = "http://" + SERVER + "/api/v2/operatingsystems/" + str(OS_ID)
+       get_os    = requests.get(URL,auth=HTTPBasicAuth(USER, PASS),verify=False).json()
+       PTABLE_ID = get_os['ptables'][0]['id']
+       ARCH_ID   =  get_os['architectures'][0]['id']
+       for i in get_os['os_default_templates']:
+           prov_ids.append(i['provisioning_template_id'])
+
+       return PTABLE_ID, ARCH_ID, prov_ids
+
+   else:
+       print "No SOURCE OS FOUND, please create or change SOURCE_OS variable"
+       sys.exit(-1)
+
+
+def get_source_id(SERVER):
+    URL="http://" + SERVER + "/api/v2/hostgroups"
+    get_hg=requests.get(URL,auth=HTTPBasicAuth(USER, PASS),verify=False).json()
+    results = get_hg['results']
+    for i in results:
+        if i['name'] == SOURCE_HG:
+            return i['id']
+
+def get_hg_classes(SERVER,HG_ID):
+    URL="http://" + SERVER + "/api/v2/hostgroups/" + str(HG_ID) + "/puppetclass_ids"
+    get_classes=requests.get(URL,auth=HTTPBasicAuth(USER, PASS),verify=False).json()
+    return get_classes['results']
+
+
+
+def create_env(SERVER,new_env):
+    URL="https://" + SERVER + "/api/v2/environments"
+    environment={"environment":{"name":new_env}}
+    HEADERS = {"Accept": "application/json","Content-Type":"application/json"}
+    create_env=requests.post(URL,auth=HTTPBasicAuth(USER, PASS), data=json.dumps(environment), headers=HEADERS,verify=False).json()
+    print create_env
+    return create_env['id']
+
+
+def clone_hg(SERVER, NAME, HG_ID):
+    PARAMS={'name': NAME}
+    URL="https://" + SERVER + "/api/v2/hostgroups/" + str(HG_ID) + "/clone"
+    clone_hg=requests.post(URL,params=PARAMS,auth=HTTPBasicAuth(USER, PASS),verify=False,headers=HEADERS).json()
+    return clone_hg
+
+
+def update_hg(SERVER, NEW_HG_ID, OS_ID, MEDIA_ID, ENV_ID, PUPPET_CLASSES):
+    URL       = "https://" + SERVER + "/api/hostgroups/" + str(NEW_HG_ID)
+    HEADERS   = {"Accept": "application/json","Content-Type":"application/json"}
+    DATA      = {"hostgroup":{"medium_id": MEDIA_ID,'operatingsystem_id':OS_ID,'environment_id':ENV_ID,'puppetclasses':PUPPET_CLASSES}}
+    upd_hg    = requests.put(URL,data=json.dumps(DATA),auth=HTTPBasicAuth(USER, PASS),verify=False,headers=HEADERS).json()
+    print upd_hg
+    return upd_hg
+    
+
+#Clone OS first
+
+ptableID,archID,provIDs = get_details_from_source(SERVER)
+mId = get_media_id(SERVER, NEW_ENV)
+
+operatingsystem = {"operatingsystem":{'name':OS_NAME,'major':OS_MAJOR,'family':OS_FAMILY,'medium_ids':[mId], 'architecture_ids':[archID],'ptable_ids':[ptableID],'provisioning_template_ids':provIDs,}}
+create_os       = requests.post(OS_URL,auth=(USER, PASS),data=json.dumps(operatingsystem),headers=HEADERS,verify=False).json()
+print "OS"
+print create_os 
+
+
+# Clone HG
+
+osId     = create_os['id']
+sourceId = get_source_id(SERVER)
+pClasses = get_hg_classes(SERVER, sourceId)
+print "pclasses: ",pClasses
+newHg    = clone_hg(SERVER, NAME, sourceId)
+newHgId  = newHg['id']
+newEnvId = create_env(SERVER,NEW_ENV)
+updateHg = update_hg(SERVER, newHgId, osId, mId, newEnvId,pClasses)
+print "update hg"
+print updateHg
