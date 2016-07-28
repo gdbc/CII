@@ -402,6 +402,7 @@ EOF
     mkdir -p {bats,puppet/environments/{7_dev,7_uat,7_prd}}
     ```
   * The following is ultimately the tree of what the git repo should look like once you’ve added modules, this should be the same or the code in jenkins needs to be changed to suite:
+  ```
     ├── bats
     └── puppet
       └── environments
@@ -414,5 +415,7 @@ EOF
         └── 7_uat
             ├── manifests
             └── modules
+  ```
+  
 
 
