@@ -84,7 +84,6 @@ Here we setup a cron job (<<cron-yum-repo-sync.sh>>) to continually sync from ou
 * Storage: mount: /var/www/html size: 100GB
 * Memory: 4GB
 
-<b><u>Scripts</u></b>
-<add script paths to github repo>
-Configuration Script: yum-server-repo-srv-config.sh
-Cron Script: cron-yum-repo-sync.sh
+<b><u>Scripts:</u></b>
+* Configuration Script: (<<yum-server-repo-srv-config.sh>>)
+* Cron Script: (<<cron-yum-repo-sync.sh>>)
