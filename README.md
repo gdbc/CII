@@ -111,9 +111,10 @@ Installing the Pulp server is out of scope as there's sufficient documentation o
 <b><u>Scripts:</u></b>
 * Configure yum repos: [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh)
 * Install Pulp Server: install-pulp.sh
-* Create, sync master repo: create-sync-master-repos.sh
-* Sync master repo group: sync-master-repo-group.py
-* Pulp environment diff check: pulp-env-diff-check.py
+* Create, sync master repo: [create-sync-master-repos.sh](https://github.com/gdbc/CII/blob/master/cii/pulp/create-sync-master-repos.sh)
+* Sync master repo group: [sync-master-repo-group.py](https://github.com/gdbc/CII/blob/master/cii/pulp/sync-master-repo-group.py)
+* Pulp environment diff check: [pulp-env-diff-check.py](https://github.com/gdbc/CII/blob/master/cii/pulp/pulp-env-diff-check.py)
+* Clone a repo group: [clone-create-repo-group.sh](https://github.com/gdbc/CII/blob/master/cii/pulp/clone-create-repo-group.sh)
 
 <b><u>Note:</u></b> The [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh) should be run to setup each server to point to the yum repo server repositories to get their requisite packages.
 
@@ -121,8 +122,8 @@ Installing the Pulp server is out of scope as there's sufficient documentation o
 
 * Edit the server entry in [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh) and run it to setup the yum repos we will use as our upstream source.
 * Configure mount point /var/lib/pulp and /var/lib/mongodb
-* Change REPO_SERVER and MASTER_GROUP_ID in create-sync-master-repos.sh and execute. This will create the master pulp repo group and repos that syncs directly from the repo server. This repo will be used to determine diffs against the eng environment, then eng against dev and so on to determine a difference and kickoff a jenkins jobs.
-* Change USER/PASS SERVER_URL in clone-create-repo-group.sh and create your other environments.
+* Change REPO_SERVER and MASTER_GROUP_ID in [create-sync-master-repos.sh](https://github.com/gdbc/CII/blob/master/cii/pulp/create-sync-master-repos.sh) and execute. This will create the master pulp repo group and repos that syncs directly from the repo server. This repo will be used to determine diffs against the eng environment, then eng against dev and so on to determine a difference and kickoff a jenkins jobs.
+* Change USER/PASS SERVER_URL in [clone-create-repo-group.sh](https://github.com/gdbc/CII/blob/master/cii/pulp/clone-create-repo-group.sh) and create your other environments.
   * Syntax: ./clone-create-repo-group.sh SRC_GRP DST_GRP FEED_GRP
   … where FEED_GRP is the repo group you’ll be syncing from ie: dev -> uat -> prd eg:
    ```
@@ -130,8 +131,8 @@ Installing the Pulp server is out of scope as there's sufficient documentation o
    ./clone-create-repo-group.sh 7_dev 7_uat 7_dev
    ./clone-create-repo-group.sh 7_uat 7_prd 7_uat
    ```
-* Change SERVER, DST_ENV and USER/PASS in sync-master-repo-group.py and copy it to /etc/cron.daily
-* Create three or however many copies of pulp-env-diff-check.py, one for each repo group or environment, this involves changing SERVER, SRC_ENV, DST_ENV and the JENKINS_SERVER_URI. This script compares a repository group against one that it syncs from(source). This enables us to determine if new packages are found upstream and if there are, a jenkins job is triggered to test these new packages. 
+* Change SERVER, DST_ENV and USER/PASS in [sync-master-repo-group.py](https://github.com/gdbc/CII/blob/master/cii/pulp/sync-master-repo-group.py) and copy it to /etc/cron.daily
+* Create three or however many copies of [pulp-env-diff-check.py](https://github.com/gdbc/CII/blob/master/cii/pulp/pulp-env-diff-check.py), one for each repo group or environment, this involves changing SERVER, SRC_ENV, DST_ENV and the JENKINS_SERVER_URI. This script compares a repository group against one that it syncs from(source). This enables us to determine if new packages are found upstream and if there are, a jenkins job is triggered to test these new packages. 
   * Example: For the DEV environment, SRC_ENV would be “7_master” and DST_ENV would be “7_dev”. What this means is a diff between the “7_master” and “7_dev” repo group is run periodically and if a diff exists (more packages in the 7_master repo), a jenkins job will be started.
   * Put these script in cron.daily or whatever suites or in line with business requirements.
  
@@ -285,7 +286,7 @@ repo --name=jenkins          --baseurl=http://<%= @host.params['pulp-server'] %>
      * `mkdir -p /etc/puppet/environments/7_tst/{modules, manifests}`
 * For the purposes of this how to we’re creating a “dev”, “uat” and “prd” environment, so lets create the two extra environments.
    * `mkdir -p /etc/puppet/environments/{7_uat,7_prd}/{modules,manifests}`
-* <b>NB:</b> You should go back and use clone-create-repo-group.sh to create the Pulp repo group if the environment is newer than the ones created. See Pulp Server section. <- this should be done first
+* <b>NB:</b> You should go back and use [clone-create-repo-group.sh](https://github.com/gdbc/CII/blob/master/cii/pulp/clone-create-repo-group.sh) to create the Pulp repo group if the environment is newer than the ones created. See Pulp Server section. <- this should be done first
 * Now that we're finished the 7_dev or dev environment we can clone this to the 7_uat and 7_prd. Change the SERVER, USER and PASS variables in [clone-os-hg.py](https://github.com/gdbc/CII/blob/master/cii/foreman/clone-os-hg.py)
 	Make sure the part of the name matches the environment:
             
@@ -427,7 +428,7 @@ That's it, you're done and ready to initialize jobs via adding/editing BAT tests
 
 The cron job on the repo server[cron-yum-repo-sync.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/cron-yum-repo-sync.sh) will sync from upstream yum repos. 
 
-The cron jobs on the pulp server (pulp-env-diff-check-dev.py, pulp-env-diff-check-uat.py, pulp-env-diff-check-prd.py… or one for each environment) will sync from the repo server and diff against the pulp repositories where if it finds a diff for dev(between 7_master and 7_dev), diff to uat(between 7_dev and 7_uat) and lastly diff to prd(between 7_uat to 7_prd).
+The cron jobs on the pulp server (pulp-env-diff-check-dev.py, pulp-env-diff-check-uat.py, pulp-env-diff-check-prd.py… or one for each environment) you can create by a cp and minor edits to [pulp-env-diff-check.py](https://github.com/gdbc/CII/blob/master/cii/pulp/pulp-env-diff-check.py) will sync from the repo server and diff against the pulp repositories where if it finds a diff for dev(between 7_master and 7_dev), diff to uat(between 7_dev and 7_uat) and lastly diff to prd(between 7_uat to 7_prd).
 
 If a Jenkins job fails the test system used to run the job will stay up for troubleshooting purposes. Bare in mind if a system is up and there are no more test systems in the pool the “cii-run” job will fail.
 
