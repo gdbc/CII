@@ -71,8 +71,11 @@ Restart the server or libvirtd
 =============
 ## Yum Repo Server
 
-This server probably exists in your environment already as a provider of yum repositories to your clients. Here we are using it merely as a proof of concept for completion purposes.
+This server probably exists in your environment already as a provider of yum repositories to your clients. Here we're using it merely as a proof of concept for completion purposes.
 
-This server is connected to external yum repo providers as well as being able to host local company specific repos with custom rpms, it's the upstream source of where the Pulp server will source its content for our CII engine. Edit (<<yum-server-repo-srv-config.sh>>) to change, and create your repos. Again, if you have a yum repository server already ignore this script.
+This server is connected to external, upstream yum repository providers as well as being able to host local company specific repos with custom rpms, it's the upstream source of where the Pulp server will source its content for our CII engine, serving primarily the 7_master Pulp repo group. 
 
-Here we setup a cron job (<<cron-yum-repo-sync.sh>>) to continually sync from our upstream repositories. We will create a sync between Pulp and the repository server so we can determine diffs in packages within each environments repositories. This will be one of our build triggers and configured later.
+```
+Edit (<<yum-server-repo-srv-config.sh>>) to change, and create your repos. Again, if you have a yum repository server already ignore this script.
+```
+Here we setup a cron job (<<cron-yum-repo-sync.sh>>) to continually sync from our upstream repositories. We will create a sync between Pulp and the repository server so we can determine diffs in repositories within each Pulp repo groups repositories. This will be one of our build triggers and configured later.
