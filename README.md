@@ -324,7 +324,7 @@ The Jenkins server is the orchestrator of all of our jobs and the backbone to th
 * Configure yum repos: [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh)
 * User pass library: [userpass.py](https://github.com/gdbc/CII/blob/master/cii/jenkins/libs/userpass.py)
 * Jenkins Configs: [cii-run-config.xml](https://github.com/gdbc/CII/blob/master/cii/jenkins/configs/cii-run-config.xml), [post_cii_promotion_config.xml](https://github.com/gdbc/CII/blob/master/cii/jenkins/configs/post_cii_promotion_config.xml)
-* GIT post-receive hook: post-receive
+* GIT post-receive hook: [post-receive](https://github.com/gdbc/CII/blob/master/cii/jenkins/git_hooks/post-receive)
 
 <b><u>To Do:</u></b> 
 * Install Jenkins and support packages:
@@ -418,7 +418,7 @@ EOF
             └── modules
   ```
 * Populate your repo with your puppet modules and bats code to resemble the above
-* Add the git post-receive hook on the server in project/hooks and make it executable. 
+* Add the git [post-receive](https://github.com/gdbc/CII/blob/master/cii/jenkins/git_hooks/post-receive) hook on the server in project/hooks and make it executable. 
 * This hook will kick off jenkins jobs for each environment 7_dev,7_uat or 7_prd environments when a “git post” is run. It will do the same for bat test updates for 7_dev, though each jenkins run will pull a fresh copy of bats and run it. The bats tests are not segmented between environments like the puppet environments.
 * The variable `“JENKINS_SERVER"` and possibly `"JENKINS_PROJECT"` and `"JENKINS_PROJECT_TOKEN"` will need to be edited to coincide with the parameters set in the jenkins job
 
