@@ -24,8 +24,7 @@ These three points:
 * Automate testing of added/edited puppet configuration in GIT
 * Automate execution and graphing of Bash Automated Testing(BAT: https://github.com/sstephenson/bats) which is Test      Anything Protocol (TAP: https://testanything.org/producers.html) compliant, when tests are added or edited in GIT. These tests are run post build and used for verification of build integrity to justify functionality in a designated environment.
 
-These 3 points are represented diagramatically [here](https://github.com/gdbc/CII/blob/master/cii/diagrams/CII-Flow.jpg).
-![CII Flow Diagram](https://github.com/gdbc/CII/blob/master/cii/diagrams/CII-Flow.jpg?raw=true "CII Flow Diagram")
+These 3 points are represented diagramatically In the below flow diagram ![CII Flow Diagram](https://github.com/gdbc/CII/blob/master/cii/diagrams/CII-Flow.jpg?raw=true "CII Flow Diagram")
 
 This enables infrastructure teams to release patches and configuration and automatically test the results of those changes and those patches and configuration will work in the target environments, be it DEV, UAT or PRD, reducing or negating manual effort to achieve and document the same results.
 
