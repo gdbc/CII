@@ -8,13 +8,13 @@
 
 ## Introduction
 
-This is a poor man's guide to building an Automated Continuous Infrastructure Integration or CII on RPM based Linux distributions that use Puppet and GIT. 
+This is a poor man's guide to building an Automated Continuous Infrastructure Integration(CII) on RPM based Linux distributions using Puppet(foreman support for 3.8 at this time), Pulp, Foreman and GIT. 
 
-Use this guide if you want to sync and test newly synced packages in an environment automatically, as well as test new or edited puppet code and post install TAP compliant scripts to test, verify and graph build environment integrity after packages have been installed and puppet has been run.
+This is called the "poor man’s guide” as we leverage most of the FOSS upstream tools bundled into Red Hat’s Satellite Server(Foreman, Pulp, Puppet) and combine them into Jenkins jobs that produce automated patch, configuration and environment tests on OS builds. So if you don't have Red Hat Satellite in your environment but need automated testing of configuration code and packages on your builds, pre-release, this guide can be useful to you.
 
-This is called the "poor man’s guide” as we leverage most of the FOSS upstream tools bundled into Red Hat’s Satellite Server(Foreman, Pulp, Puppet) and combine them via API scripts and Jenkins to produce automated patch, configuration and testing of Operating System builds. So if you don't have Red Hat Satellite in your environment but need automated testing of code and packages on your builds, then this guide is for you.
+Use it if you want to test RPM based packages before they're synced to stable client facing repos, as well as test new or edited puppet code automatically. After the package installs and Puppet runs we run standard compliant environment validation tests in the form of BAT(TAP compliant) scripts which are used to verify and graph build environment integrity and application tests. This all adds extra verification and validation to builds before they hit client facing environments. Catching issues before they cause issues or outages is what we're after.
 
- For a good CII template based on Red Hat’s Satellite server, please look at Dr Nick Strugnell's excellent guide here: https://github.com/RedHatSatellite/soe-ci.
+For a good CII template based on Red Hat’s Satellite server, please look at Dr Nick Strugnell's excellent guide here: https://github.com/RedHatSatellite/soe-ci.
  
  This guide will show you how to to setup and configure an CII engine that can be initialized from 3 execution points.
 
@@ -24,7 +24,7 @@ These three points:
 * Automate testing of added/edited puppet configuration in GIT
 * Automate execution and graphing of Bash Automated Testing(BAT: https://github.com/sstephenson/bats) which is Test      Anything Protocol (TAP: https://testanything.org/producers.html) compliant, when tests are added or edited in GIT. These tests are run post build and used for verification of build integrity to justify functionality in a designated environment.
 
-These 3 points are represented diagramatically In the below flow diagram. ![CII Flow Diagram](https://github.com/gdbc/CII/blob/master/cii/diagrams/CII-Flow.jpg?raw=true "CII Flow Diagram")
+Below you can see these points represented graphically in the below flow diagram. ![CII Flow Diagram](https://github.com/gdbc/CII/blob/master/cii/diagrams/CII-Flow.jpg?raw=true "CII Flow Diagram")
 
 This enables infrastructure teams to release patches and configuration and automatically test the results of those changes and those patches and configuration will work in the target environments, be it DEV, UAT or PRD, reducing or negating manual effort to achieve and document the same results.
 
