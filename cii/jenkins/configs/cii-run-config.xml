@@ -1272,7 +1272,7 @@ else:
       </threshold>
     </hudson.tasks.BuildTrigger>
     <hudson.tasks.Mailer plugin="mailer@1.17">
-      <recipients>graemedbc@gmail.com</recipients>
+      <recipients>user@company.com</recipients>
       <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
       <sendToIndividuals>false</sendToIndividuals>
     </hudson.tasks.Mailer>
