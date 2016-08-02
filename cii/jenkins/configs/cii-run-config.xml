@@ -787,7 +787,7 @@ def sync_env(proxy_id, env_id, server, user, password):
          
 sync_run = exec_sync(ENV,SERVER, SSH_USER, SSH_PASS)
 if sync_run:
-            print &quot;Sync run successfully, syncing Foreman puppet environment!&quot;
+            print &quot;Sync successful!&quot;
             PROXY_ID = get_proxy_id(SERVER, USER, PASS)
             ENV_ID   = get_env_id(ENV, SERVER, USER, PASS)
             SYNC_ENV = sync_env(PROXY_ID, ENV_ID, SERVER, USER, PASS)
