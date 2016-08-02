@@ -445,6 +445,7 @@ while True:
     print &quot;Waiting an extra minute!&quot;
     if TOT_WAIT == TIME_LIM:
         print &quot;Waited &quot; + str(TOT_WAIT) + &quot; seconds for puppet to run without error, exiting!&quot;
+        sys.exit(1)
         break
         
 print &quot;&quot;
@@ -889,6 +890,7 @@ while True:
     print &quot;Waiting an extra minute!&quot;
     if TOT_WAIT == TIME_LIM:
         print &quot;Waited &quot; + str(TOT_WAIT) + &quot; seconds for puppet to run without error, exiting!&quot;
+        sys.exit(1)
         break
         
 print &quot;&quot;
@@ -1101,6 +1103,7 @@ while True:
     print &quot;Waiting an extra minute!&quot;
     if TOT_WAIT == TIME_LIM:
         print &quot;Waited &quot; + str(TOT_WAIT) + &quot; seconds for puppet to run without error, exiting!&quot;
+        sys.exit(1)
         break
         
 print &quot;&quot;
