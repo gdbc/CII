@@ -44,13 +44,18 @@ requests.packages.urllib3.disable_warnings()
 print &quot;STARTING REPO PROMOTION SYNC!&quot;
 
 SRC_ENV    = os.getenv(&apos;SRC_ENV&apos;)
+print &quot;SRC is: %s&quot; SRC_ENV
 
 # Work out destination to sync to based on recently updated repository
 
+if SRC_ENV  == &quot;7_master&quot;:
+    DST_ENV =  &quot;7_dev&quot;
 if SRC_ENV  == &quot;7_dev&quot;:
     DST_ENV =  &quot;7_uat&quot;
 if SRC_ENV  == &quot;7_uat&quot;:
     DST_ENV =  &quot;7_prd&quot;
+
+print &quot;DST is: %s&quot; %DST_ENV
 # A more practical example could be promotion to staging repos where tests are carried out, then upon success the packages are promoted to uat, prd etc
 
 #if SRC_ENV  == &quot;7_dev_staging&quot;:
@@ -64,7 +69,7 @@ if SRC_ENV  == &quot;7_uat&quot;:
 #if SRC_ENV  == &quot;7_prd_staging&quot;:
 #    DST_ENV =  &quot;7_prd&quot;
 
-print &quot;DST is: %s&quot; %DST_ENV
+
 
 
 USER       = userpass().creds()[&apos;pulp&apos;][&apos;user&apos;]
