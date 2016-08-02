@@ -366,7 +366,7 @@ mkdir -p /var/lib/jenkins/jobs/{cii-run,post-cii-promotion}
 cp /tmp/cii-run-config.xml /var/lib/jenkins/jobs/cii-run/config.xml
 cp /tmp/post_cii_repo_sync.xml /var/lib/jenkins/jobs/post-cii-promotion/config.xml
 ```
-* <b><u>Note:</u></b> The post-cii-promotion is just an example script that can promote a repo to another Eg: from a staging repo group and environment where the tests were carried out to an official dev repo group and dev environment, there may be change control restrictions here etc, though this is a good example of something to do after the tests have passed ie: send a notification. You may also not want to sync to live repos in case of failure.
+* <b><u>Note:</u></b> The post-cii-promotion is just an example script that can promote a repo to another Eg: from a staging repo group and environment where the tests were carried out to an official dev repo group and dev environment, there may be change control restrictions here etc, though consider this a place holder of something to do after a successful run(recommendations welcome) ie: send a notification. You may also not want to sync to live repos in case of failure.
 ```
 chown jenkins.jenkins -R /var/lib/jenkins/jobs/
 systemctl restart jenkins
