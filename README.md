@@ -8,13 +8,13 @@
 
 ## Introduction
 
-This is a poor man's guide to building an Automated Continuous Infrastructure Integration or CII on RPM based Linux distributions that use Puppet and GIT. 
+This is a poor man's guide to building an Automated Continuous Infrastructure Integration(CII) on RPM based Linux distributions using Puppet(foreman support for 3.8 at this time), Pulp, Foreman and GIT. 
 
-Use this guide if you want to sync and test newly synced packages in an environment automatically, as well as test new or edited puppet code and post install TAP compliant scripts to test, verify and graph build environment integrity after packages have been installed and puppet has been run.
+This is called the "poor man’s guide” as we leverage most of the FOSS upstream tools bundled into Red Hat’s Satellite Server(Foreman, Pulp, Puppet) and combine them into Jenkins jobs that produce automated patch, configuration and environment tests on OS builds. So if you don't have Red Hat Satellite in your environment but need automated testing of configuration code and packages on your builds pre-release, this guide can be useful to you.
 
-This is called the "poor man’s guide” as we leverage most of the FOSS upstream tools bundled into Red Hat’s Satellite Server(Foreman, Pulp, Puppet) and combine them via API scripts and Jenkins to produce automated patch, configuration and testing of Operating System builds. So if you don't have Red Hat Satellite in your environment but need automated testing of code and packages on your builds, then this guide is for you.
+Use it if you want to test RPM based packages before they're synced to stable client facing repos, as well as test new or edited puppet code automatically. At the end of the package installs and Puppet runs we run standard compliant envirnment validation tests in the form of BAT(TAP compliant) scripts which are used to verify and graph build environment integrity and application tests. This all adds extra verification and validation to builds before they hit client facing environments.  Catching issues before they cause issues or outages is what we're after.
 
- For a good CII template based on Red Hat’s Satellite server, please look at Dr Nick Strugnell's excellent guide here: https://github.com/RedHatSatellite/soe-ci.
+For a good CII template based on Red Hat’s Satellite server, please look at Dr Nick Strugnell's excellent guide here: https://github.com/RedHatSatellite/soe-ci.
  
  This guide will show you how to to setup and configure an CII engine that can be initialized from 3 execution points.
 
