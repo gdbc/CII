@@ -58,6 +58,7 @@ vim-enhanced
 screen
 wget
 puppet
+bc
 %end
 
 %post --log=/root/ks-post.log
