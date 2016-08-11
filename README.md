@@ -193,8 +193,8 @@ cp -r /etc/puppet/environments/7_dev/modules/* /etc/puppet/modules/
    * Make sure permissions are foreman-proxy.puppet on this file
 * Create two global parameters that we will override in our templates 
    * Configure -> Global parameters
-   pulp-server: <pulp server>
-   foreman-server:<foreman server>
+      * pulp-server: <pulp server>
+      * foreman-server:<foreman server>
 * Add the kickstart template
    * Hosts -> Provisioning Templates -> New Template -> Name: ks-7
    * Add [ks-7](https://github.com/gdbc/CII/blob/master/cii/foreman/ks-7) FILE
