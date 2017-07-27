@@ -13,7 +13,7 @@ for i in $REPOIDS;do
 echo "
 [$i]
 name=$i Repository
-baseurl=http://$REPO_SERVER/pub/centos7/$i
+baseurl=http://$REPO_SERVER/$REPO_URL/$i
 gpgcheck=0
 enabled=1
 " >>                    $REPOPATH/$i.repo
