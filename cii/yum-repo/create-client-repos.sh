@@ -3,7 +3,7 @@
 REPO_SERVER="ci-pulp.example.com"
 REPOPATH="/etc/yum.repos.d/"
 REPO_URL="pulp/repos"
-REPOIDS="base extras updates puppetlabs-deps puppetlabs-products epel foreman foreman-plugins jenkins pulp-2-stable"
+REPOIDS="base extras updates puppetlabs-deps puppetlabs-products epel foreman foreman-plugins jenkins pulp-2-stable centos-sclo-rh centos-sclo-sclo"
 ENV="7_master"
 
 # Remove existing yum repositories
