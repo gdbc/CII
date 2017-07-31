@@ -165,6 +165,8 @@ What we’re doing here is setting up the first environment(7_dev) and from ther
 <b><u>To Do:</u></b>
 
 * Edit the server entry in [create-cii-server-repos.sh](https://github.com/gdbc/CII/blob/master/cii/yum-repo/create-cii-server-repos.sh) and run it to setup the yum repos to get our install and upstream packages.
+* If this server was configured as a puppet client, remove /var/lib/puppet/ssl which contains the client certs or the installation will fail.
+
 * Install Foreman:
 ```
 yum install foreman-installer git python-requests -y 
